@@ -1,0 +1,19 @@
+{
+  "name": "endless-sky-bindings",
+  "version": "0.1.0",
+  "description": "JavaScript bindings for Endless Sky C++ code",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomasballinger/endless-sky-bindings.git"
+  },
+  "author": "Thomas Ballinger",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/thomasballinger/endless-sky-bindings/issues"
+  },
+  "homepage": "https://github.com/thomasballinger/endless-sky-bindings#readme"
+}
