@@ -1,5 +1,10 @@
+JavaScript bindings for Endless Sky CPP code.
 
+~~~
+import libFactory from "../endless-sky-bindings/index.mjs";
 
-TODO
-* apply necessary patches (e.g. <mad.h> -> "FakeMad.h") to submodule
-* 
+(async function () {
+  const esLib = await libFactory();
+  console.log(new esLib.Point(1, 2));
+})();
+~~~
