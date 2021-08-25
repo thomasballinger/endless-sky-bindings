@@ -1,5 +1,4 @@
 import Module from "./lib-node.mjs";
-console.log(Module);
 (async function () {
   const module = await Module();
   const p = new module.Point(10, 12);

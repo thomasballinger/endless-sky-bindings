@@ -7,7 +7,6 @@
   <script type="module">
     (async function(){
       const {default: modP} = await import('./lib-web.mjs')
-      console.log(modP);
       const module = await modP();
       const p = new module.Point(10, 12);
       console.log(p);

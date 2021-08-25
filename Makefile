@@ -29,18 +29,16 @@ CFLAGS = $(COMMON_FLAGS)\
 CPPS := $(shell ls endless-sky/source/*.cpp) $(shell ls endless-sky/source/text/*.cpp)
 CPPS_EXCEPT_MAIN := $(shell ls endless-sky/source/*.cpp | grep -v main.cpp) $(shell ls endless-sky/source/text/*.cpp)
 TEMP := $(subst endless-sky/source/,build/emcc/,$(CPPS))
-#OBJS := $(subst .cpp,.o,$(TEMP))
-OBJS := build/emcc/Point.o build/emcc/Random.o build/emcc/Angle.o build/emcc/DataNode.o build/emcc/Files.o build/emcc/File.o build/emcc/DataFile.o build/emcc/text/Utf8.o
+OBJS := $(subst .cpp,.o,$(TEMP))
 TEMP := $(subst endless-sky/source/,build/emcc/,$(CPPS_EXCEPT_MAIN))
-#OBJS_EXCEPT_MAIN := $(subst .cpp,.o,$(TEMP))
-OBJS_EXCEPT_MAIN := $(OBJS)
+OBJS_EXCEPT_MAIN := $(subst .cpp,.o,$(TEMP))
 HEADERS := $(shell ls endless-sky/source/*.h*) $(shell ls endless-sky/source/text/*.h*) libjpeg-turbo-2.1.0/libturbojpeg.a
 
 build/emcc/%.o: endless-sky/source/%.cpp
 ifndef EMSCRIPTEN_ENV
 	$(error "emmake is not available, activate the emscripten env first")
 endif
-	@mkdir -p build/emcc
+	@mkdir -p build/emcc/text
 	em++ $(CFLAGS) -c $< -o $@
 
 build/emcc/text/%.o: endless-sky/source/text/%.cpp
@@ -60,7 +58,7 @@ endif
 patch: patch.diff
 	# patch.diff should correspond to https://github.com/thomasballinger/endless-web/compare/master...browser-support
 	# but some files can be removed from the patch
-	cd endless-sky; git clean -dxf
+	cd endless-sky; git clean -dxf; git stash
 	cd endless-sky; git apply --whitespace=nowarn ../patch.diff
 
 WEB_AND_NODE_FLAGS = -s EXPORT_ES6=1\
