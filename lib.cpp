@@ -54,10 +54,17 @@ EMSCRIPTEN_BINDINGS(DataNode) {
     .constructor<const DataNode*>()
     .function("Size", &DataNode::Size)
     .function("Value", (double(DataNode::*)(int) const)&DataNode::Value)
+    .function("Token", &DataNode::Token)
     .function("IsNumber", (bool(DataNode::*)(int) const)&DataNode::IsNumber)
     .function("HasChildren", &DataNode::Size)
     .function("PrintTrace", &DataNode::PrintTrace)
+    .function("children", optional_override(
+            [](DataNode& this_) {
+              return std::vector<DataNode> { std::begin(this_), std::end(this_) };
+            }
+        ))
     ;
+  register_vector<DataNode>("DataNodeVec");
 }
 
 // Examples of writing custom functions
