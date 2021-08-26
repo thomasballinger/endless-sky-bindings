@@ -4,7 +4,7 @@ Use as a ES6 Module, in node or in the browser with a bundler:
 ~~~
 import esLibFactory from "endless-web-bindings";
 
-(async function () {
+(async function() {
   const esLib = await esLibFactory();
   console.log(new esLib.Point(1, 2));
 })();
@@ -14,7 +14,7 @@ Use in a browser script tag, without a bundler:
 
 ~~~
 <script type="module">
-(async function () {
+(async function() {
   const {default: esLibFactory} = await import('https://unpkg.com/endless-sky-bindings/index.mjs?module');
   ');
   const esLib = await esLibFactory();
@@ -28,14 +28,20 @@ Use in the node REPL (shown with top-level await which is on by default in node 
 
 ~~~
 > const {default: esLibFactory} = await import('endless-web-bindings');
-> esLib = await esLibFactory();
+> const esLib = await esLibFactory();
 > p = new esLib.Point(1, 2));
+Point {}
 > p.X();
+1
 ~~~
 
 [Use in an Observable Notebook](https://observablehq.com/@ballingt/endless-sky-cpp-bindings)
  
----
+## Wrapped classes
+
+See [lib.cpp](./lib.cpp) for which classes are wrapped. It's not hard to add more, but there are some limitations:
+* only one constructor overload can be directly exposed
+* int64 conversions require manual wrapping to convert to int
 
 ## How this works
 
