@@ -8,6 +8,7 @@
     (async function(){
       const {default: modP} = await import('./lib-web.mjs')
       const module = await modP();
+      window.esLib = module;
       const p = new module.Point(10, 12);
       console.log(p);
       const x = p.X();

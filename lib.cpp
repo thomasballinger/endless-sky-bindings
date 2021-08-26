@@ -1,9 +1,10 @@
 // quick_example.cpp
 #include <emscripten/bind.h>
 
-#include "endless-sky/source/Random.h"
-#include "endless-sky/source/DataNode.h"
+#include "endless-sky/source/Account.h"
 #include "endless-sky/source/Angle.h"
+#include "endless-sky/source/DataNode.h"
+#include "endless-sky/source/Random.h"
 #include "endless-sky/source/Point.h"
 
 #include "endless-sky/tests/include/datanode-factory.h"
@@ -11,6 +12,55 @@
 #include <iostream>
 using namespace emscripten;
 
+// source/Account
+EMSCRIPTEN_BINDINGS(Account) {
+  class_<Account>("Account")
+    .constructor<>()
+    // TODO is optional_override always necessary for int64_t? Could we change int64_t?
+    .function("Credits", optional_override(
+            [](Account& this_) {
+                return (int) this_.Account::Credits();
+            }
+        ))
+    .function("AddCredits", optional_override(
+            [](Account& this_, int value) {
+                return this_.Account::AddCredits((int64_t) value);
+            }
+        ))
+    ;
+}
+
+// source/Angle
+EMSCRIPTEN_BINDINGS(Angle) {
+  class_<Angle>("Angle")
+    // TODO how to use multiple constructor overloads?
+    .constructor<double>()
+    .function("Degrees", &Angle::Degrees)
+    // TODO how to bind operator overloads?
+    .function("Unit", &Angle::Unit)
+    .function("Rotate", &Angle::Rotate)
+    ;
+}
+
+
+// DataNode factory
+EMSCRIPTEN_BINDINGS(AsDataNode) {
+    function("AsDataNode", &AsDataNode);
+}
+
+// DataNode
+EMSCRIPTEN_BINDINGS(DataNode) {
+  class_<DataNode>("DataNode")
+    .constructor<const DataNode*>()
+    .function("Size", &DataNode::Size)
+    .function("Value", (double(DataNode::*)(int) const)&DataNode::Value)
+    .function("IsNumber", (bool(DataNode::*)(int) const)&DataNode::IsNumber)
+    .function("HasChildren", &DataNode::Size)
+    .function("PrintTrace", &DataNode::PrintTrace)
+    ;
+}
+
+// Examples of writing custom functions
 void randSeed(int seed) {
     const uint64_t s = (uint64_t) seed;
     Random::Seed(s);
@@ -24,33 +74,8 @@ int randInt(int mod) {
 }
 
 
-// DataNode factory
-EMSCRIPTEN_BINDINGS(somethingwhatgoeshere) {
-    function("AsDataNode", &AsDataNode);
-}
-
-// DataNode
-EMSCRIPTEN_BINDINGS(my_class_example) {
-  class_<DataNode>("DataNode")
-    .constructor<const DataNode*>()
-    .function("Size", &DataNode::Size)
-    .function("Value", (double(DataNode::*)(int) const)&DataNode::Value)
-    .function("IsNumber", (bool(DataNode::*)(int) const)&DataNode::IsNumber)
-    .function("HasChildren", &DataNode::Size)
-    .function("PrintTrace", &DataNode::PrintTrace)
-    ;
-}
-
-// Angle
-EMSCRIPTEN_BINDINGS(my_class_example2) {
-  class_<Angle>("Angle")
-    .constructor<>()
-    .function("Degrees", &Angle::Degrees)
-    ;
-}
-
 // Point
-EMSCRIPTEN_BINDINGS(my_class_example4) {
+EMSCRIPTEN_BINDINGS(Point) {
   class_<Point>("Point")
     .constructor<double, double>()
     .function("X", &Point::Xval)
