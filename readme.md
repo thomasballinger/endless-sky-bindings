@@ -1,4 +1,4 @@
-JavaScript bindings for Endless Sky C++ code.
+# JavaScript bindings for Endless Sky C++ code
 
 Use as a ES6 Module, in node or in the browser with a bundler:
 ~~~
