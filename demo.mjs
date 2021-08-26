@@ -26,11 +26,15 @@ function eg(strings) {
   eg`account.AddCredits(100)`;
   eg`account.Credits()`;
   eg([
-    's = `ship "Shuttle"\n\tsprite "ship/shuttle"\n`; ship = esLib.AsDataNode(s);',
+    's = `ship "Shuttle"\n\tsprite "ship/shuttle"\n`; shipNode = esLib.AsDataNode(s);',
   ]);
-  eg`ship.HasChildren();`;
-  eg`ship.Size();`;
-  eg`ship.children().size();`;
-  eg`ship.children().get(0).Token(0);`;
-  eg`ship.children().get(0).Token(1);`;
+  eg`shipNode.HasChildren();`;
+  eg`shipNode.Size();`;
+  eg`shipNode.children().size();`;
+  eg`shipNode.children().get(0).Token(0);`;
+  eg`shipNode.children().get(0).Token(1);`;
+
+  eg`s = new esLib.Ship(shipNode);`;
+  eg`s.ModelName()`;
+  eg`s.FlightCheck().get(0)`;
 })();

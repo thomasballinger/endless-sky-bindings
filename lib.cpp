@@ -6,6 +6,7 @@
 #include "endless-sky/source/DataNode.h"
 #include "endless-sky/source/Random.h"
 #include "endless-sky/source/Point.h"
+#include "endless-sky/source/Ship.h"
 
 #include "endless-sky/tests/include/datanode-factory.h"
 
@@ -43,12 +44,12 @@ EMSCRIPTEN_BINDINGS(Angle) {
 }
 
 
-// DataNode factory
+// test/src/helpers/datanode-factory
 EMSCRIPTEN_BINDINGS(AsDataNode) {
     function("AsDataNode", &AsDataNode);
 }
 
-// DataNode
+// source/DataNode
 EMSCRIPTEN_BINDINGS(DataNode) {
   class_<DataNode>("DataNode")
     .constructor<const DataNode*>()
@@ -67,6 +68,21 @@ EMSCRIPTEN_BINDINGS(DataNode) {
   register_vector<DataNode>("DataNodeVec");
 }
 
+// TODO how do inner classes work?
+// source/Ship
+EMSCRIPTEN_BINDINGS(Ship) {
+  class_<Ship>("Ship")
+    .constructor<const DataNode&>()
+    .function("Name", &Ship::Name)
+    .function("ModelName", &Ship::ModelName)
+    .function("Description", &Ship::Description)
+    .function("Cost", &Ship::Cost)
+    .function("ChassisCost", &Ship::ChassisCost)
+    .function("FlightCheck", &Ship::FlightCheck)
+    ;
+  register_vector<std::string>("StringVec");
+}
+
 // Examples of writing custom functions
 void randSeed(int seed) {
     const uint64_t s = (uint64_t) seed;
@@ -81,7 +97,7 @@ int randInt(int mod) {
 }
 
 
-// Point
+// source/Point
 EMSCRIPTEN_BINDINGS(Point) {
   class_<Point>("Point")
     .constructor<double, double>()
