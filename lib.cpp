@@ -76,8 +76,16 @@ EMSCRIPTEN_BINDINGS(Ship) {
     .function("Name", &Ship::Name)
     .function("ModelName", &Ship::ModelName)
     .function("Description", &Ship::Description)
-    .function("Cost", &Ship::Cost)
-    .function("ChassisCost", &Ship::ChassisCost)
+    .function("Cost", optional_override(
+            [](Ship& this_) {
+                return (int) this_.Ship::Cost();
+            }
+        ))
+    .function("ChassisCost", optional_override(
+            [](Ship& this_) {
+                return (int) this_.Ship::ChassisCost();
+            }
+        ))
     .function("FlightCheck", &Ship::FlightCheck)
     ;
   register_vector<std::string>("StringVec");

@@ -1,11 +1,12 @@
 {
   "name": "endless-sky-bindings",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "JavaScript bindings for Endless Sky C++ code",
   "main": "index",
   "module": "index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "make lib-node.mjs lib-web.mjs"
   },
   "repository": {
     "type": "git",

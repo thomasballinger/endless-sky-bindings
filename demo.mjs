@@ -36,5 +36,6 @@ function eg(strings) {
 
   eg`s = new esLib.Ship(shipNode);`;
   eg`s.ModelName()`;
+  eg`s.Cost()`;
   eg`s.FlightCheck().get(0)`;
 })();
