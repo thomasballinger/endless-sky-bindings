@@ -4,8 +4,9 @@
 #include "endless-sky/source/Account.h"
 #include "endless-sky/source/Angle.h"
 #include "endless-sky/source/DataNode.h"
-#include "endless-sky/source/Random.h"
+#include "endless-sky/source/GameData.h"
 #include "endless-sky/source/Point.h"
+#include "endless-sky/source/Random.h"
 #include "endless-sky/source/Ship.h"
 
 #include "endless-sky/tests/include/datanode-factory.h"
@@ -97,6 +98,19 @@ EMSCRIPTEN_BINDINGS(Dictionary) {
             }
         ))
     ;
+}
+
+// source/GameData
+EMSCRIPTEN_BINDINGS(GameData) {
+  class_<GameData>("GameData");
+  function("GameDataBeginLoad", optional_override(
+            []() {
+                const char *argv[1] = {"progname"};
+                GameData::BeginLoad(argv);
+                return true;
+            }
+        ));
+  function("GameDataCheckReferences", &GameData::CheckReferences);
 }
 
 // TODO consider "custom marshalling" as described at https://github.com/emscripten-core/emscripten/issues/11070#issuecomment-717675128

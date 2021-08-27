@@ -61,7 +61,7 @@ patch: patch.diff
 	cd endless-sky; git clean -dxf; git stash
 	cd endless-sky; git apply --whitespace=nowarn ../patch.diff
 
-WEB_AND_NODE_FLAGS = -s EXPORT_ES6=1\
+LINKER_FLAGS = -s EXPORT_ES6=1\
 		--bind\
 		--no-entry\
 		lib.cpp\
@@ -71,14 +71,24 @@ WEB_AND_NODE_FLAGS = -s EXPORT_ES6=1\
 		${COMMON_FLAGS}\
 		$(OBJS_EXCEPT_MAIN)\
 		-s LLD_REPORT_UNDEFINED\
+		-s NO_DISABLE_EXCEPTION_CATCHING\
 		--pre-js pre_js.js\
+		--preload-file endless-sky/data@data\
+		--preload-file empty@images\
+		--preload-file empty@sounds\
+		--preload-file empty@saves\
+		-s ALLOW_MEMORY_GROWTH=1\
+		--preload-file endless-sky/credits.txt@credits.txt\
 
-lib-web.mjs lib-web.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0
-	em++ $(WEB_AND_NODE_FLAGS) -o lib-web.mjs
+empty:
+	mkdir -p empty
+	touch empty/empty
+
+lib-web.mjs lib-web.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0 empty
+	em++ $(LINKER_FLAGS) -o lib-web.mjs
 
 lib-node.mjs: lib-web.mjs lib-web.wasm
-	em++ $(WEB_AND_NODE_FLAGS) -o lib-node.mjs
-	rm lib-node.wasm
+	cp lib-web.mjs lib-node.mjs
 	./post_compile_mjs lib-node.mjs
 
 web: demo.html lib-web.mjs
@@ -89,3 +99,5 @@ node: demo.mjs lib-node.mjs
 
 clean:
 	rm -rf lib-web.mjs lib-web.wasm lib-node.mjs lib-node.wasm
+clean-full: clean
+	rm -rf build

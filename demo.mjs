@@ -72,11 +72,12 @@ async function eg(strings) {
   eg`s.ModelName()`;
   eg`toObj(s.BaseAttributes().Attributes())`;
   eg`s.ChassisCost()`;
-  eg`s.Cost()`;
+  eg`s.Cost() // cost won't work yet because outfits aren't loaded`;
 
+  eg`esLib.GameDataBeginLoad() // this takes a second`;
   eg`s.FinishLoading(true);`;
-  eg`s.Place(new esLib.Point(0, 0), new esLib.Point(0, 0), new esLib.Angle(0));`;
-  eg`toObj(s.Attributes().Attributes())`;
   eg`s.Cost()`;
-  await eg`s.FlightCheck().get(0)`;
+  eg`toObj(s.Attributes().Attributes())`;
+  eg`s.Place(new esLib.Point(0, 0), new esLib.Point(0, 0), new esLib.Angle(0));`;
+  eg`s.FlightCheck().size()`;
 })();
