@@ -71,12 +71,14 @@ WEB_AND_NODE_FLAGS = -s EXPORT_ES6=1\
 		${COMMON_FLAGS}\
 		$(OBJS_EXCEPT_MAIN)\
 		-s LLD_REPORT_UNDEFINED\
+		--pre-js pre_js.js\
 
 lib-web.mjs lib-web.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0
 	em++ $(WEB_AND_NODE_FLAGS) -o lib-web.mjs
 
-lib-node.mjs lib-node.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0
-	em++ $(WEB_AND_NODE_FLAGS) --pre-js pre_js.js -o lib-node.mjs
+lib-node.mjs: lib-web.mjs lib-web.wasm
+	em++ $(WEB_AND_NODE_FLAGS) -o lib-node.mjs
+	rm lib-node.wasm
 	./post_compile_mjs lib-node.mjs
 
 web: demo.html lib-web.mjs
