@@ -1,11 +1,15 @@
-1.1.4
+0.1.7
+
+* Loading GameData, ships working now that outfits can load
+
+0.1.6
 
 * bind Ship class
 
-1.1.3
+0.1.3
 
 * expose just enough DataNode methods to parse
 
-1.1.2
+0.1.2
 
 * bind Account class
