@@ -83,7 +83,7 @@ web: demo.html lib-web.mjs
 	emrun --serve_after_close --serve_after_exit --browser chrome --private_browsing demo.html
 
 node: demo.mjs lib-node.mjs
-	node demo.mjs
+	node --experimental-repl-await demo.mjs
 
 clean:
 	rm -rf lib-web.mjs lib-web.wasm lib-node.mjs lib-node.wasm

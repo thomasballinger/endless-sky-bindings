@@ -68,6 +68,39 @@ EMSCRIPTEN_BINDINGS(DataNode) {
   register_vector<DataNode>("DataNodeVec");
 }
 
+// source/Dictionary
+EMSCRIPTEN_BINDINGS(Dictionary) {
+  class_<Dictionary>("Dictionary")
+    .constructor<>()
+    .function("Get", (double(Dictionary::*)(const std::string &) const)&Dictionary::Get)
+    .function("Set", optional_override(
+        [](Dictionary& this_, const std::string &key, double value) {
+          this_[key] = value;
+        }
+    ))
+    .function("keys", optional_override(
+            [](Dictionary& this_) {
+              std::vector<std::string> keys;
+              for (auto elem: this_) {
+                keys.push_back(elem.first);
+              }
+              return keys;
+            }
+        ))
+    .function("values", optional_override(
+            [](Dictionary& this_) {
+              std::vector<double> values;
+              for (auto elem: this_) {
+                values.push_back(elem.second);
+              }
+              return values;
+            }
+        ))
+    ;
+}
+
+// TODO consider "custom marshalling" as described at https://github.com/emscripten-core/emscripten/issues/11070#issuecomment-717675128
+
 // TODO how do inner classes work?
 // source/Ship
 EMSCRIPTEN_BINDINGS(Ship) {
@@ -76,6 +109,7 @@ EMSCRIPTEN_BINDINGS(Ship) {
     .function("Name", &Ship::Name)
     .function("ModelName", &Ship::ModelName)
     .function("Description", &Ship::Description)
+    // I wonder how this gets set, it's currently 0
     .function("Cost", optional_override(
             [](Ship& this_) {
                 return (int) this_.Ship::Cost();
@@ -86,9 +120,20 @@ EMSCRIPTEN_BINDINGS(Ship) {
                 return (int) this_.Ship::ChassisCost();
             }
         ))
+    .function("Attributes", &Ship::Attributes)
+    .function("BaseAttributes", &Ship::BaseAttributes)
+    .function("Recharge", &Ship::Recharge)
+
+    .function("Place", &Ship::Place)
+    .function("SetName", &Ship::SetName)
+    .function("SetIsSpecial", &Ship::SetIsSpecial)
+
+    .function("FinishLoading", &Ship::FinishLoading)
+
     .function("FlightCheck", &Ship::FlightCheck)
     ;
   register_vector<std::string>("StringVec");
+  register_vector<double>("DoubleVec");
 }
 
 // Examples of writing custom functions
@@ -104,6 +149,15 @@ int randInt(int mod) {
   return smallValue;
 }
 
+// source/Outfit
+EMSCRIPTEN_BINDINGS(Outfit) {
+  class_<Outfit>("Outfit")
+    .constructor<>()
+    .function("Load", &Outfit::Load)
+    .function("Name", &Outfit::Name)
+    .function("Attributes", &Outfit::Attributes)
+    ;
+}
 
 // source/Point
 EMSCRIPTEN_BINDINGS(Point) {
