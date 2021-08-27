@@ -91,10 +91,10 @@ lib-node.mjs: lib-web.mjs lib-web.wasm
 	cp lib-web.mjs lib-node.mjs
 	./post_compile_mjs lib-node.mjs
 
-web: demo.html lib-web.mjs
+web: demo.html lib-web.mjs index.mjs
 	emrun --serve_after_close --serve_after_exit --browser chrome --private_browsing demo.html
 
-node: demo.mjs lib-node.mjs
+node: demo.mjs lib-node.mjs index.mjs
 	node --experimental-repl-await demo.mjs
 
 clean:

@@ -6,13 +6,15 @@
 <body>
   <script type="module">
     (async function(){
-      const {default: modP} = await import('./lib-web.mjs')
-      const module = await modP();
-      window.esLib = module;
-      const p = new module.Point(10, 12);
+      const {default: modP} = await import('./index.mjs')
+      const esLib = await modP();
+      window.esLib = esLib;
+      const p = new esLib.Point(10, 12);
       console.log(p);
       const x = p.X();
       console.log(x);
+      console.log('loading data...');
+      console.log(esLib.GameDataBeginLoad());
     })();
   </script>
 </body>
