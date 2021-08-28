@@ -29,12 +29,11 @@ Use in a browser script tag, without a bundler:
 ~~~
 
 
-Use in the node REPL (shown with top-level await which is on by default in node 16, for node 14 use `node --experimental-repl-await`):
+Use in the node REPL (shown with top-level await which is on by default in node 16, for node <16 use `node --experimental-repl-await`):
 
 ~~~
 > const {default: esLibFactory} = await import('endless-web-bindings');
 > const esLib = await esLibFactory();
-> esLib.GameDataBeginLoad(); // optional
 > p = new esLib.Point(1, 2));
 Point {}
 > p.X();
@@ -57,3 +56,16 @@ This repository has a specific commit of Endless Sky as a submodule. A patch (pa
 These modified Endless Sky C++ files are compiled with Emscripten with bindings provided by the Emscripten [embind](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html) macros in lib.cpp.
 
 These distributed files include core Endless Sky game data but not images or sounds.
+
+## Potential Uses of this library
+These aren't possible yet, but might influence design.
+
+* npm-installable command line data parser which exactly mirrors game loading logic
+* live preview of derived properties when making data file changes
+* GUI ship editor that produces data files for plugin authors
+* text editor tool providing autocompletion and syntax highlighting when writing data files
+* "fly this ship around" widget that embeds the full game on a webpage with tweakable stats/outfits
+* player assistance tools displaying game information live as it is played
+* online mission editor tool
+* deep linking to game situations more specific than a savefile
+* hooks into game logic for customization of https://play-endless-web.com from JavaScript
