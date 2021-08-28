@@ -48,6 +48,7 @@ Point {}
 See [lib.cpp](./lib.cpp) for which classes are wrapped. It's not hard to add more, but there are some limitations:
 * only one constructor overload can be directly exposed
 * int64 conversions require manual wrapping to convert to int
+* I haven't figured out templates
 
 ## How this works
 
