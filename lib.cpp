@@ -7,6 +7,7 @@
 #include "endless-sky/source/GameData.h"
 #include "endless-sky/source/Point.h"
 #include "endless-sky/source/Random.h"
+#include "endless-sky/source/Set.h"
 #include "endless-sky/source/Ship.h"
 
 #include "endless-sky/tests/include/datanode-factory.h"
@@ -100,6 +101,7 @@ EMSCRIPTEN_BINDINGS(Dictionary) {
     ;
 }
 
+// TODO make these static methods and properties on GameData
 // source/GameData
 EMSCRIPTEN_BINDINGS(GameData) {
   class_<GameData>("GameData");
@@ -111,9 +113,41 @@ EMSCRIPTEN_BINDINGS(GameData) {
             }
         ));
   function("GameDataCheckReferences", &GameData::CheckReferences);
+  function("GameDataShips", &GameData::Ships);
 }
 
 // TODO consider "custom marshalling" as described at https://github.com/emscripten-core/emscripten/issues/11070#issuecomment-717675128
+
+
+
+// TODO can we write our own templates here to deal wtih this Set<T>?
+// source/Set
+EMSCRIPTEN_BINDINGS(Set) {
+  typedef Set<Ship> SetOfShips;
+  register_map<std::string, Ship>("ShipMap");
+  register_vector<Ship>("ShipVec");
+  class_<SetOfShips>("SetOfShips")
+    .function("Get", (const Ship* (SetOfShips::*)(const std::string &) const)&SetOfShips::Get, allow_raw_pointer<ret_val>())
+    .function("keys", optional_override(
+            [](SetOfShips& this_) {
+              std::vector<std::string> keys;
+              for (auto elem: this_) {
+                keys.push_back(elem.first);
+              }
+              return keys;
+            }
+        ))
+    .function("values", optional_override(
+            [](SetOfShips& this_) {
+              std::vector<Ship> values;
+              for (auto elem: this_) {
+                values.push_back(elem.second);
+              }
+              return values;
+            }
+        ))
+      ;
+}
 
 // TODO how do inner classes work?
 // source/Ship

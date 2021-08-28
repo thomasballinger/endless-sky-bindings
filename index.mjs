@@ -6,7 +6,7 @@ export default async function ESlib() {
   if (isNode) {
     mod = await import("./lib-node.mjs");
     const libFactory = mod.default;
-    return await libFactory();
+    return augmentEsLib(await libFactory());
   } else {
     mod = await import("./lib-web.mjs");
     const libFactory = mod.default;
@@ -17,6 +17,48 @@ export default async function ESlib() {
         return ab;
       },
     };
-    return await libFactory(Module);
+    return augmentEsLib(await libFactory(Module));
   }
+}
+
+// TODO don't expose the whole Emscripten module? Use a proxy?
+
+function augmentEsLib(esLib) {
+  esLib.Dictionary.prototype.toObj = function () {
+    return dictToObject(this);
+  };
+  for (const key of Object.keys(esLib).filter((k) => k.endsWith("Vec"))) {
+    esLib[key].prototype.toArr = function () {
+      return vecToArray(this);
+    };
+  }
+  for (const key of Object.keys(esLib).filter((k) => k.startsWith("SetOf"))) {
+    esLib[key].prototype.toObj = function () {
+      return dictToObject(this);
+    };
+  }
+  for (const key of Object.keys(esLib).filter((k) => k.endsWith("Map"))) {
+    esLib[key].prototype.toObj = function () {
+      return dictToObject(this);
+    };
+  }
+  return esLib;
+}
+
+export function vecToArray(vector) {
+  const arr = [];
+  for (let i = 0; i < vector.size(); i++) {
+    arr.push(vector.get(i));
+  }
+  return arr;
+}
+// Dictionary or Set or std::map
+export function dictToObject(dict) {
+  const keysVec = dict.keys();
+  const valuesVec = dict.values();
+  const obj = {};
+  for (let i = 0; i < keysVec.size(); i++) {
+    obj[keysVec.get(i)] = valuesVec.get(i);
+  }
+  return obj;
 }

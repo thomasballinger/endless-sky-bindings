@@ -1,5 +1,7 @@
-import Module from "./lib-node.mjs";
+import esLibFactory, { vecToArray, dictToObject } from "./index.mjs";
 import { inspect } from "util";
+
+const OUTPUT_LINES = 10;
 
 // Run some code as though at the repl
 async function eg(strings) {
@@ -16,42 +18,31 @@ async function eg(strings) {
   if (val === undefined) return;
   const s = inspect(val);
   // don't print imports
-  if (s.split("\n").length > 100) return "...";
-  console.log(s);
+  if (s.split("\n").length > OUTPUT_LINES) {
+    console.log(
+      s.split("\n").slice(0, OUTPUT_LINES).join("\n") + "\n...and more"
+    );
+  } else console.log(s);
 }
 
 (async function () {
-  const module = await Module();
-  global.esLib = module;
+  await eg``;
+  const esLib = await esLibFactory();
+  global.esLib = esLib;
+  global.vecToArray = vecToArray;
+  global.dictToObject = dictToObject;
 
-  // This is the normal way to use this library.
-  const p = new module.Point(10, 12);
+  // TODO move to a testing framework and just demo the most interesting stuff here
 
   // The rest of these examples show all function being used.
   // They all uses the global scope.
-  eg`p = new esLib.Point(10, 12); p`;
-  eg`x = p.X();`;
+  eg`p = new esLib.Point(10, 12); p // create objects with 'new'`;
+  eg`x = p.X(); // the C++ methods are usually capitalized`;
   eg`d = new esLib.Dictionary();`;
   eg`d.Set("asdf", 123.123);`;
   eg`d.Get("asdf");`;
-  eg`toArr = function(vector){
-  const arr = [];
-  for (let i=0; i<vector.size(); i++) {
-    arr.push(vector.get(i));
-  }
-  return arr;
-}`;
-  eg`toObj = function(dict){
-  const keysVec = dict.keys();
-  const valuesVec = dict.values();
-  const obj = {};
-  for (let i=0; i<keysVec.size(); i++) {
-    obj[keysVec.get(i)] = valuesVec.get(i);
-  }
-  return obj;
-}`;
-  eg`toArr(d.keys());`;
-  eg`toObj(d);`;
+  eg`vecToArray(d.keys());`;
+  eg`d.toObj();`;
   eg`account = new esLib.Account();`;
   eg`account.Credits()`;
   eg`account.AddCredits(100)`;
@@ -70,14 +61,21 @@ async function eg(strings) {
 
   eg`s = new esLib.Ship(shuttleNode);`;
   eg`s.ModelName()`;
-  eg`toObj(s.BaseAttributes().Attributes())`;
+  eg`s.BaseAttributes().Attributes().toObj()`;
   eg`s.ChassisCost()`;
   eg`s.Cost() // cost won't work yet because outfits aren't loaded`;
 
   eg`esLib.GameDataBeginLoad() // this takes a second`;
   eg`s.FinishLoading(true);`;
   eg`s.Cost()`;
-  eg`toObj(s.Attributes().Attributes())`;
+  eg`s.Attributes().Attributes().toObj()`;
   eg`s.Place(new esLib.Point(0, 0), new esLib.Point(0, 0), new esLib.Angle(0));`;
-  eg`s.FlightCheck().size()`;
+  eg`s.FlightCheck().size() // an empty vector means ready for takeoff!`;
+
+  eg`aerie = esLib.GameDataShips().Get("Aerie")`;
+  eg`aerie.BaseAttributes().Attributes().toObj()`;
+  eg`x = esLib.GameDataShips()`;
+  eg`x.keys().size()`;
+  eg`x.values().size()`;
+  eg`x.toObj()`;
 })();

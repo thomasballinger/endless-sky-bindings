@@ -21,7 +21,6 @@ Use in a browser script tag, without a bundler:
 <script type="module">
 (async function() {
   const {default: esLibFactory} = await import('https://unpkg.com/endless-sky-bindings/index.mjs?module');
-  ');
   const esLib = await esLibFactory();
   esLib.GameDataBeginLoad(); // optional
   console.log(new esLib.Point(1, 2));
