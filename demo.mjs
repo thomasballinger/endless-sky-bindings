@@ -26,11 +26,8 @@ async function eg(strings) {
 }
 
 (async function () {
-  await eg``;
   const esLib = await esLibFactory();
   global.esLib = esLib;
-  global.vecToArray = vecToArray;
-  global.dictToObject = dictToObject;
 
   // TODO move to a testing framework and just demo the most interesting stuff here
 
@@ -41,41 +38,42 @@ async function eg(strings) {
   eg`d = new esLib.Dictionary();`;
   eg`d.Set("asdf", 123.123);`;
   eg`d.Get("asdf");`;
-  eg`vecToArray(d.keys());`;
-  eg`d.toObj();`;
-  eg`account = new esLib.Account();`;
-  eg`account.Credits()`;
-  eg`account.AddCredits(100)`;
-  eg`account.Credits()`;
-  eg(['simpleNode = esLib.AsDataNode(\n`ship "Shuttle"\n\tkey "value"\n`);']);
-  eg`simpleNode.HasChildren();`;
+  eg`d.keys(); // sometimes new methods are added in bindings`;
+  eg`d.keys().toArr(); // a couple JS helper methods are tacked on...`;
+  eg`d.toObj(); // ...toObj() is the most useful`;
+  eg(['simpleNode = esLib.AsDataNode(\n`ship "My Ship"\n\tkey "value"\n`);']);
+  eg`simpleNode.HasChildren(); // data nodes can be parsed from text`;
   eg`simpleNode.children().get(0).Token(0);`;
-
   await eg`fs = await import('fs');`;
   eg`shuttleNode = esLib.AsDataNode(fs.readFileSync('./shuttle-example.txt', 'utf-8'));`;
   eg`shuttleNode.HasChildren();`;
   eg`shuttleNode.children().get(0).Token(0);`;
   eg`shuttleNode.children().get(0).Token(1);`;
-  eg`shuttleNode.children().get(1).Token(0);`;
-  eg`shuttleNode.children().get(1).Token(1);`;
 
-  eg`s = new esLib.Ship(shuttleNode);`;
+  eg`// many objects have a .Load(DataNode), some can be constructed directly`;
+  eg`s = new esLib.Ship(shuttleNode); // by passing a DataNode.`;
   eg`s.ModelName()`;
   eg`s.BaseAttributes().Attributes().toObj()`;
   eg`s.ChassisCost()`;
-  eg`s.Cost() // cost won't work yet because outfits aren't loaded`;
-
-  eg`esLib.GameDataBeginLoad() // this takes a second`;
+  eg`s.Cost() // cost won't work until .FinishLoading() to signal that outfits are loaded`;
   eg`s.FinishLoading(true);`;
   eg`s.Cost()`;
   eg`s.Attributes().Attributes().toObj()`;
   eg`s.Place(new esLib.Point(0, 0), new esLib.Point(0, 0), new esLib.Angle(0));`;
   eg`s.FlightCheck().size() // an empty vector means ready for takeoff!`;
 
+  eg`// Often you want to look up already loaded data.`;
   eg`aerie = esLib.GameDataShips().Get("Aerie")`;
   eg`aerie.BaseAttributes().Attributes().toObj()`;
+  eg`aerie.Attributes().Attributes().toObj()`;
   eg`x = esLib.GameDataShips()`;
-  eg`x.keys().size()`;
-  eg`x.values().size()`;
   eg`x.toObj()`;
 })();
+
+/*
+// TODO turn into tests
+  eg`account = new esLib.Account();`;
+  eg`account.Credits()`;
+  eg`account.AddCredits(100)`;
+  eg`account.Credits()`;
+  */

@@ -1,4 +1,8 @@
-export default async function ESlib() {
+export default async function esLib() {
+  return loadedEsLib();
+}
+
+async function simpleEsLib() {
   let isNode = typeof process !== "undefined" && process?.versions?.node;
   let mod;
 
@@ -6,7 +10,7 @@ export default async function ESlib() {
   if (isNode) {
     mod = await import("./lib-node.mjs");
     const libFactory = mod.default;
-    return augmentEsLib(await libFactory());
+    return libFactory();
   } else {
     mod = await import("./lib-web.mjs");
     const libFactory = mod.default;
@@ -17,8 +21,20 @@ export default async function ESlib() {
         return ab;
       },
     };
-    return augmentEsLib(await libFactory(Module));
+    return libFactory(Module);
   }
+}
+
+// Things like a ship's attributes can't be calculated until loading finishes
+// if the ships has outfits.
+async function augmentedEsLib() {
+  return augmentEsLib(await simpleEsLib());
+}
+
+async function loadedEsLib() {
+  const esLib = await augmentedEsLib();
+  await esLib.GameDataBeginLoad(); // this takes a couple seconds`;
+  return esLib;
 }
 
 // TODO don't expose the whole Emscripten module? Use a proxy?
