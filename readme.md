@@ -6,6 +6,11 @@ import esLibFactory from "endless-web-bindings";
 
 (async function() {
   const esLib = await esLibFactory();
+
+  // optional, loads game data which is useful for
+  // getting stats of ships with outfits
+  esLib.GameDataBeginLoad();
+
   console.log(new esLib.Point(1, 2));
 })();
 ~~~
@@ -18,6 +23,7 @@ Use in a browser script tag, without a bundler:
   const {default: esLibFactory} = await import('https://unpkg.com/endless-sky-bindings/index.mjs?module');
   ');
   const esLib = await esLibFactory();
+  esLib.GameDataBeginLoad(); // optional
   console.log(new esLib.Point(1, 2));
 })();
 </script>
@@ -29,6 +35,7 @@ Use in the node REPL (shown with top-level await which is on by default in node 
 ~~~
 > const {default: esLibFactory} = await import('endless-web-bindings');
 > const esLib = await esLibFactory();
+> esLib.GameDataBeginLoad(); // optional
 > p = new esLib.Point(1, 2));
 Point {}
 > p.X();
@@ -49,6 +56,4 @@ This repository has a specific commit of Endless Sky as a submodule. A patch (pa
 
 These modified Endless Sky C++ files are compiled with Emscripten with bindings provided by the Emscripten [embind](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html) macros in lib.cpp.
 
-## Development
-
-In development, import from `./index.mjs` or use the node or web builds directly.
+These distributed files include core Endless Sky game data but not images or sounds.
