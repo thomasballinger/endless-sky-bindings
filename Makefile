@@ -72,23 +72,27 @@ LINKER_FLAGS = -s EXPORT_ES6=1\
 		$(OBJS_EXCEPT_MAIN)\
 		-s LLD_REPORT_UNDEFINED\
 		-s NO_DISABLE_EXCEPTION_CATCHING\
-		--pre-js pre_js.js\
-		--preload-file endless-sky/data@data\
+		-s ALLOW_MEMORY_GROWTH=1\
+
+# The browser bundles data with it!
+BROWSER_LINKER_FLAGS = --preload-file endless-sky/data@data\
 		--preload-file empty@images\
 		--preload-file empty@sounds\
 		--preload-file empty@saves\
-		-s ALLOW_MEMORY_GROWTH=1\
 		--preload-file endless-sky/credits.txt@credits.txt\
+
+# Node does not have data bundled with it, you need to point it at some resources
+NODE_LINKER_FLAGS = --pre-js pre_js.js\
 
 empty:
 	mkdir -p empty
 	touch empty/empty
 
 lib-web.mjs lib-web.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0 empty
-	em++ $(LINKER_FLAGS) -o lib-web.mjs
+	em++ $(LINKER_FLAGS) $(BROWSER_LINKER_FLAGS) -o lib-web.mjs
 
-lib-node.mjs: lib-web.mjs lib-web.wasm
-	cp lib-web.mjs lib-node.mjs
+lib-node.mjs lib-node.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0
+	em++ $(LINKER_FLAGS) $(NODE_LINKER_FLAGS) -o lib-node.mjs
 	./post_compile_mjs lib-node.mjs
 
 web: demo.html lib-web.mjs index.mjs
