@@ -3,6 +3,8 @@ libjpeg-turbo-2.1.0/
 build
 
 lib-node.mjs
+lib-node.wasm
+lib-node.data
 lib-web.mjs
 lib-web.wasm
 lib-web.data

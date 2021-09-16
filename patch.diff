@@ -74,22 +74,6 @@ index 00000000..41e4bfd2
 +# define MAD_F_FRACBITS		28
 +# define MAD_F(x)		((mad_fixed_t) (x##L))
 +# define MAD_F_ONE		MAD_F(0x10000000)
-diff --git a/source/Files.cpp b/source/Files.cpp
-index df6fca14..ed686613 100644
---- a/source/Files.cpp
-+++ b/source/Files.cpp
-@@ -75,6 +75,11 @@ void Files::Init(const char * const *argv)
- 			
- 	}
- 	
-+#ifdef __EMSCRIPTEN__
-+	config = "/";
-+	resources = "/";
-+#endif
-+	
- 	if(resources.empty())
- 	{
- 		// Find the path to the resource directory. This will depend on the
 diff --git a/source/GameWindow.cpp b/source/GameWindow.cpp
 index a7327023..da5b6d71 100644
 --- a/source/GameWindow.cpp

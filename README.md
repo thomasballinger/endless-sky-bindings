@@ -9,7 +9,7 @@ import esLibFactory from "endless-web-bindings";
 
   // optional, loads game data which is useful for
   // getting stats of ships with outfits
-  esLib.GameDataBeginLoad();
+  esLib.GameDataBeginLoad([]);
 
   console.log(new esLib.Point(1, 2));
 })();
@@ -22,7 +22,7 @@ Use in a browser script tag, without a bundler:
 (async function() {
   const {default: esLibFactory} = await import('https://unpkg.com/endless-sky-bindings/index.mjs?module');
   const esLib = await esLibFactory();
-  esLib.GameDataBeginLoad(); // optional
+  esLib.GameDataBeginLoad([]); // optional
   console.log(new esLib.Point(1, 2));
 })();
 </script>

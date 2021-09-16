@@ -105,11 +105,14 @@ EMSCRIPTEN_BINDINGS(Dictionary) {
 // source/GameData
 EMSCRIPTEN_BINDINGS(GameData) {
   class_<GameData>("GameData");
-  function("GameDataBeginLoad", optional_override(
-            []() {
-                const char *argv[1] = {"progname"};
-                GameData::BeginLoad(argv);
-                return true;
+  function("_GameDataBeginLoad", optional_override(
+            [](std::vector<std::string> argVec) {
+                std::vector<char *> cstrs;
+                cstrs.reserve(argVec.size() + 1);
+                for (auto &s : argVec) {
+                    cstrs.push_back(const_cast<char *>(s.c_str()));
+                }
+                return GameData::BeginLoad(cstrs.data());
             }
         ));
   function("GameDataCheckReferences", &GameData::CheckReferences);

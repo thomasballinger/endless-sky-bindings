@@ -1,5 +1,6 @@
 EMSCRIPTEN_ENV := $(shell command -v emmake 2> /dev/null)
 
+all: node web
 2.1.0.tar.gz:
 	wget https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/2.1.0.tar.gz
 libjpeg-turbo-2.1.0: 2.1.0.tar.gz
@@ -83,6 +84,11 @@ BROWSER_LINKER_FLAGS = --preload-file endless-sky/data@data\
 
 # Node does not have data bundled with it, you need to point it at some resources
 NODE_LINKER_FLAGS = --pre-js pre_js.js\
+		--preload-file endless-sky/data@data\
+		--preload-file empty@images\
+		--preload-file empty@sounds\
+		--preload-file empty@saves\
+		--preload-file endless-sky/credits.txt@credits.txt\
 
 empty:
 	mkdir -p empty
@@ -101,7 +107,8 @@ web: demo.html lib-web.mjs index.mjs
 node: demo.mjs lib-node.mjs index.mjs
 	node --experimental-repl-await demo.mjs
 
-clean:
+clean-some:
 	rm -rf lib-web.mjs lib-web.wasm lib-node.mjs lib-node.wasm
-clean-full: clean
+
+clean: clean-some
 	rm -rf build

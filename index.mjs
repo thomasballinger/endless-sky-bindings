@@ -1,5 +1,5 @@
-export default async function esLib() {
-  return loadedEsLib();
+export default async function esLib(loadArgs = []) {
+  return loadedEsLib(loadArgs);
 }
 
 async function simpleEsLib() {
@@ -27,17 +27,27 @@ async function simpleEsLib() {
 
 // Things like a ship's attributes can't be calculated until loading finishes
 // if the ships has outfits.
-async function augmentedEsLib() {
+export async function augmentedEsLib() {
   return augmentEsLib(await simpleEsLib());
 }
 
-async function loadedEsLib() {
+export async function loadedEsLib(args) {
   const esLib = await augmentedEsLib();
-  await esLib.GameDataBeginLoad(); // this takes a couple seconds`;
+  const isNode = typeof process !== "undefined" && process?.versions?.node;
+  if (isNode) {
+    await esLib.GameDataBeginLoad(args);
+  } else {
+    // In the browser, use
+    await esLib.GameDataBeginLoad([
+      "--resources",
+      "/",
+      "--config",
+      "/",
+      ...args,
+    ]); // this takes a couple seconds`;
+  }
   return esLib;
 }
-
-// TODO don't expose the whole Emscripten module? Use a proxy?
 
 function augmentEsLib(esLib) {
   esLib.Dictionary.prototype.toObj = function () {
@@ -58,6 +68,13 @@ function augmentEsLib(esLib) {
       return dictToObject(this);
     };
   }
+  esLib.GameDataBeginLoad = (args) => {
+    const arr = new esLib.StringVec();
+    for (const arg of args) {
+      arr.push_back(arg);
+    }
+    return esLib._GameDataBeginLoad(arr);
+  };
   return esLib;
 }
 

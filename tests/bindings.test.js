@@ -1,13 +1,14 @@
-import esLibFactory from "../index.mjs";
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { augmentedEsLib } from "../index.mjs";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 import * as assert from "assert";
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const esLib = await esLibFactory();
+// this does *not* try to load bundled data
+const esLib = await augmentedEsLib();
 
 const shuttleExample = `ship "Shuttle"
 sprite "ship/shuttle"
@@ -56,43 +57,46 @@ description \`	Shuttles are not designed to withstand combat of any sort, but th
 
 describe("Endless Sky bindings", () => {
   describe("account", () => {
-    it('works', () => {
+    it("works", () => {
       const account = new esLib.Account();
       assert.deepEqual(account.Credits(), 0);
-      account.AddCredits(100)
+      account.AddCredits(100);
       assert.deepEqual(account.Credits(), 100);
     });
   });
 
   describe("Point", () => {
-    it('works', () => {
+    it("works", () => {
       const p = new esLib.Point(10, 12);
       assert.deepEqual(p.X(), 10);
     });
   });
 
   describe("Dictionary", () => {
-    it('works', () => {
+    it("works", () => {
       const d = new esLib.Dictionary();
       d.Set("asdf", 123.123);
       assert.strictEqual(d.Get("asdf"), 123.123);
-      assert.deepStrictEqual(d.keys().toArr(), ['asdf']);
-      assert.deepStrictEqual(d.toObj(), { "asdf": 123.123 });
-    })
+      assert.deepStrictEqual(d.keys().toArr(), ["asdf"]);
+      assert.deepStrictEqual(d.toObj(), { asdf: 123.123 });
+    });
   });
 
   describe("DataNode", () => {
-    it('can be build from a string', () => {
+    it("can be build from a string", () => {
       const s = `ship "My Ship"\n\tkey "value"\n`;
       const simpleNode = esLib.AsDataNode(s);
       assert.strictEqual(simpleNode.HasChildren(), 2);
-      assert.strictEqual(simpleNode.children().get(0).Token(0), 'key');
+      assert.strictEqual(simpleNode.children().get(0).Token(0), "key");
     });
   });
 
   describe("Ship", () => {
-    it('can be constructed from a datanode', () => {
-      const shuttleExample = fs.readFileSync(path.join(__dirname, 'shuttle-example.txt'), 'utf-8');
+    it("can be constructed from a datanode", () => {
+      const shuttleExample = fs.readFileSync(
+        path.join(__dirname, "shuttle-example.txt"),
+        "utf-8"
+      );
       const shuttleNode = esLib.AsDataNode(shuttleExample);
       const s = new esLib.Ship(shuttleNode);
       assert.strictEqual(s.ModelName(), "Shuttle");
@@ -100,5 +104,5 @@ describe("Endless Sky bindings", () => {
       s.ChassisCost();
       assert.strictEqual(s.Cost(), 0);
     });
-  })
+  });
 });
