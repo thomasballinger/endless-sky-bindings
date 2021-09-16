@@ -2,7 +2,7 @@ export default async function esLib(loadArgs = []) {
   return loadedEsLib(loadArgs);
 }
 
-async function simpleEsLib() {
+export async function simpleEsLib() {
   let isNode = typeof process !== "undefined" && process?.versions?.node;
   let mod;
 
@@ -35,7 +35,32 @@ export async function loadedEsLib(args) {
   const esLib = await augmentedEsLib();
   const isNode = typeof process !== "undefined" && process?.versions?.node;
   if (isNode) {
-    await esLib.GameDataBeginLoad(args);
+    const fs = await import("fs");
+    const path = await import("path");
+    const url = await import("url");
+    const os = await import("os");
+
+    const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+
+    // TODO this will only work in this repo here
+    const resources = path.join(__dirname, "endless-sky");
+
+    // TODO replace with WithPreparedFilesystem or something
+    //
+    const configDir = fs.mkdtempSync(path.join(os.tmpdir(), "config-"));
+    fs.mkdirSync(path.join(configDir, "saves"));
+    fs.mkdirSync(path.join(configDir, "plugins"));
+    try {
+      await esLib.GameDataBeginLoad([
+        "--resources",
+        resources,
+        "--config",
+        configDir,
+        ...args,
+      ]);
+    } finally {
+      fs.rmdirSync(configDir, { recursive: true });
+    }
   } else {
     // In the browser, use
     await esLib.GameDataBeginLoad([
@@ -68,11 +93,14 @@ function augmentEsLib(esLib) {
       return dictToObject(this);
     };
   }
-  esLib.GameDataBeginLoad = (args) => {
+  esLib.GameDataBeginLoad = function GameDataBeginLoad(args) {
     const arr = new esLib.StringVec();
+    arr.push_back("progname");
     for (const arg of args) {
+      console.log("arr.push_back(", arg);
       arr.push_back(arg);
     }
+    console.log("arr.size() from js:", arr.size());
     return esLib._GameDataBeginLoad(arr);
   };
   return esLib;

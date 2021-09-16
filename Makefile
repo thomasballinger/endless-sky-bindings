@@ -84,11 +84,7 @@ BROWSER_LINKER_FLAGS = --preload-file endless-sky/data@data\
 
 # Node does not have data bundled with it, you need to point it at some resources
 NODE_LINKER_FLAGS = --pre-js pre_js.js\
-		--preload-file endless-sky/data@data\
-		--preload-file empty@images\
-		--preload-file empty@sounds\
-		--preload-file empty@saves\
-		--preload-file endless-sky/credits.txt@credits.txt\
+		-s NODERAWFS=1\
 
 empty:
 	mkdir -p empty

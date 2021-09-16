@@ -45,6 +45,7 @@ async function eg(strings) {
   eg`simpleNode.HasChildren(); // data nodes can be parsed from text`;
   eg`simpleNode.children().get(0).Token(0);`;
   await eg`fs = await import('fs');`;
+  eg`fs`;
   eg`shuttleNode = esLib.AsDataNode(fs.readFileSync('./tests/shuttle-example.txt', 'utf-8'));`;
   eg`shuttleNode.HasChildren();`;
   eg`shuttleNode.children().get(0).Token(0);`;

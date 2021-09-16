@@ -108,11 +108,32 @@ EMSCRIPTEN_BINDINGS(GameData) {
   function("_GameDataBeginLoad", optional_override(
             [](std::vector<std::string> argVec) {
                 std::vector<char *> cstrs;
-                cstrs.reserve(argVec.size() + 1);
+                cstrs.reserve(argVec.size() + 2);
                 for (auto &s : argVec) {
                     cstrs.push_back(const_cast<char *>(s.c_str()));
                 }
+                cstrs.push_back(NULL);
+                std::cout << "argVec.size(): " << argVec.size() << "\n";
+                std::cout << "cstrs.size(): " << cstrs.size() << "\n";
+                std::cout << "cstrs.data(): " << *cstrs.data() << "\n";
                 return GameData::BeginLoad(cstrs.data());
+            }
+        ));
+  function("_GameDataBeginLoad2", optional_override(
+            [](std::string arg1, std::string arg2) {
+                std::vector<char *> *cstrs = new std::vector<char *>;
+                cstrs->reserve(3);
+                cstrs->push_back(const_cast<char *>(arg1.c_str()));
+                cstrs->push_back(const_cast<char *>(arg2.c_str()));
+                cstrs->push_back(NULL);
+                return GameData::BeginLoad(cstrs->data());
+            }
+        ));
+  function("_GameDataBeginLoad0", optional_override(
+            []() {
+                const char *argv[2] = {"progname", NULL};
+                GameData::BeginLoad(argv);
+                return true;
             }
         ));
   function("GameDataCheckReferences", &GameData::CheckReferences);
