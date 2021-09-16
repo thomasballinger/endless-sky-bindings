@@ -8,3 +8,4 @@ lib-web.wasm
 lib-web.data
 
 empty
+node_modules
