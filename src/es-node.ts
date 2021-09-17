@@ -3,7 +3,7 @@ import * as path from "path";
 import * as url from "url";
 import * as os from "os";
 
-import * as mod from "./lib-node.mjs";
+import * as mod from "./lib-node";
 import { withPreparedFilesystem } from "./filesystem";
 import { augmentEsLib, ESLib } from "./augmentlib";
 
@@ -29,7 +29,7 @@ export async function loadedEsLib(loadArgs: string[]): Promise<ESLib> {
         resources,
         "--config",
         config,
-        ...args,
+        ...loadArgs,
       ]);
     }
   );

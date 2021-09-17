@@ -2,6 +2,11 @@
 libjpeg-turbo-2.1.0/
 build
 
+src/lib-node.js
+src/lib-node.wasm
+src/lib-web.js
+src/lib-web.wasm
+src/lib-web.data
 
 empty
 node_modules

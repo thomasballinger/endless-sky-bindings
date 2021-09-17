@@ -5,8 +5,13 @@
     "emitDeclarationOnly": true,
     "noImplicitAny": true,
     "outDir": "dist/",
-    "sourceMap": true
+    "sourceMap": false
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts"
+  ]
 }

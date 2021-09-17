@@ -4,18 +4,6 @@
   "description": "JavaScript bindings for Endless Sky C++ code",
   "main": "dist/index",
   "module": "dist/index.mjs",
-  "types": "dest/index.d.ts",
-  "scripts": {
-    "esbuild-node-base": "./node_modules/.bin/esbuild src/es-node.ts --bundle --format=esm --external:./lib-node.mjs --platform=node --outfile=dist/es-node.mjs",
-    "esbuild-web-base": "./node_modules/.bin/esbuild src/es-node.ts --bundle --format=esm --external:./lib-node.mjs --platform=node --outfile=dist/es-node.mjs",
-    "esbuild-node": "npm run esbuild-node-base -- --sourcemap",
-    "esbuild-web": "npm run esbuild-web-base -- --sourcemap",
-    "esbuild-node-watch": "npm run esbuild-node-base -- --sourcemap --watch",
-    "esbuild-web-watch": "npm run esbuild-web-base -- --sourcemap --watch",
-    "types": "tsc 
-    "test": "npx mocha -r ts-node/register **/*.test.*s",
-    "prepublish": "make lib-node.mjs lib-web.mjs"
-  },
   "type": "module",
   "repository": {
     "type": "git",
@@ -27,6 +15,18 @@
     "url": "https://github.com/thomasballinger/endless-sky-bindings/issues"
   },
   "homepage": "https://github.com/thomasballinger/endless-sky-bindings#readme",
+  "scripts": {
+    "esbuild-node-base": "./node_modules/.bin/esbuild src/es-node.ts --bundle --format=esm --external:./lib-node.mjs --platform=node --outfile=dist/es-node.mjs",
+    "esbuild-web-base": "./node_modules/.bin/esbuild src/es-node.ts --bundle --format=esm --external:./lib-node.mjs --platform=node --outfile=dist/es-node.mjs",
+    "esbuild-node": "npm run esbuild-node-base -- --sourcemap",
+    "esbuild-web": "npm run esbuild-web-base -- --sourcemap",
+    "esbuild-node-watch": "npm run esbuild-node-base -- --sourcemap --watch",
+    "esbuild-web-watch": "npm run esbuild-web-base -- --sourcemap --watch",
+    "build": "make src/lib-node.mjs src/lib-web.mjs; npm run esbuild-node; npm run esbuild-web; cp src/lib-* dist/; cp src/index.mjs dist/",
+    "types": "tsc",
+    "test": "mocha -r ts-node/register **/*.test.*s",
+    "prepublish": "npm run build"
+  },
   "devDependencies": {
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.9.1",

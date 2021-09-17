@@ -1,8 +1,8 @@
-# This Makefile builds Emscripten outputs dist/lib-web.mjs and dist/lib-node.mjs
+# This Makefile builds Emscripten outputs dist/lib-web.js and dist/lib-node.js
 
 EMSCRIPTEN_ENV := $(shell command -v emmake 2> /dev/null)
 
-all: dist/lib-web.mjs dist/lib-node.mjs
+all: src/lib-web.js src/lib-node.js
 test: node web
 2.1.0.tar.gz:
 	wget https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/2.1.0.tar.gz
@@ -93,21 +93,21 @@ empty:
 	mkdir -p empty
 	touch empty/empty
 
-dist/lib-web.mjs dist/lib-web.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0 empty
-	em++ $(LINKER_FLAGS) $(BROWSER_LINKER_FLAGS) -o dist/lib-web.mjs
+src/lib-web.js src/lib-web.wasm src/lib-web.data: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0 empty
+	em++ $(LINKER_FLAGS) $(BROWSER_LINKER_FLAGS) -o src/lib-web.js
 
-dist/lib-node.mjs dist/lib-node.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0
-	em++ $(LINKER_FLAGS) $(NODE_LINKER_FLAGS) -o dist/lib-node.mjs
-	./post_compile_mjs lib-node.mjs
+src/lib-node.js src/lib-node.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0
+	em++ $(LINKER_FLAGS) $(NODE_LINKER_FLAGS) -o src/lib-node.js
+	./post_compile_js src/lib-node.js
 
-web: demo.html dist/lib-web.mjs dist/lib-web.wasm index.mjs
+web: demo.html src/lib-web.js src/lib-web.wasm src/lib-web.data index.js
 	emrun --serve_after_close --serve_after_exit --browser chrome --private_browsing demo.html
 
-node: demo.mjs dist/lib-node.mjs dist/lib-node.wasm index.mjs
+node: demo.mjs src/lib-node.js src/lib-node.wasm index.mjs
 	node --experimental-repl-await demo.mjs
 
 clean-some:
-	rm -rf lib-web.mjs lib-web.wasm dist/lib-node.mjs dist/lib-node.wasm
+	rm -rf lib-web.js lib-web.wasm src/lib-node.js src/lib-node.wasm
 
 clean: clean-some
 	rm -rf build

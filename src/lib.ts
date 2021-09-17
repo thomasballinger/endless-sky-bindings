@@ -34,7 +34,19 @@ export type DataNode = {
 };
 
 export type ESLibRaw = {
-  Account: { new (): Account };
-  Angle: { new (): Angle };
-  DataNodeVec: { new (): Vector<DataNode> };
+  Account: { new(): Account };
+  Angle: { new(): Angle };
+  DataNodeVec: { new(): Vector<DataNode> };
 };
+
+// Emscripten Module object https://emscripten.org/docs/api_reference/module.html
+export type ModuleInitializer = {
+  getPreloadedPackage(
+    remotePackageName: string,
+    remotePackageSize: string
+  ): ArrayBuffer
+}
+
+export type Mod = {
+  default(module?: ModuleInitializer): ESLibRaw;
+}
