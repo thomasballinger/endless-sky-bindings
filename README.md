@@ -2,26 +2,26 @@
 
 JavaScript wrapper for the C++ classes in [Endless Sky](https://github.com/endless-sky/endless-sky), compiled to JavaScript + WebAssembly by Emscripten.
 
-~~~
+```sh
 npm install endless-sky-bindings
-~~~
+```
 
 
 ## Usage examples
 
 Use as a ES6 Module in node:
-~~~
+```js
 import libFactory from "endless-sky-bindings/dist/es-node.js";
 
 (async function () {
   const esLib = await libFactory();
   console.log(new esLib.Point(1, 2));
 })();
-~~~
+```
 
 Use in a browser script tag, without a bundler:
 
-~~~
+```html
 <script type="module">
 (async function() {
   const {default: esLibFactory} = await import('https://unpkg.com/endless-sky-bindings/dist/es-web.mjs?module');
@@ -30,18 +30,18 @@ Use in a browser script tag, without a bundler:
   console.log(new esLib.Point(1, 2));
 })();
 </script>
-~~~
+```
 
 Use in the node REPL (shown with top-level await which is on by default in node 16, for node <16 use `node --experimental-repl-await`):
 
-~~~
+```sh
 > const {default: libFactory} = await import('endless-sky-bindings/dist/es-node.js');
 > const esLib = await libFactory();
 > p = new esLib.Point(1, 2));
 Point {}
 > p.X();
 1
-~~~
+```
 
 [Use in an Observable Notebook](https://observablehq.com/@ballingt/endless-sky-cpp-bindings)
  
