@@ -16,25 +16,28 @@
   },
   "homepage": "https://github.com/thomasballinger/endless-sky-bindings#readme",
   "scripts": {
-    "esbuild-node-base": "./node_modules/.bin/esbuild src/es-node.ts --bundle --format=esm --external:./lib-node.mjs --platform=node --outfile=dist/es-node.mjs",
-    "esbuild-web-base": "./node_modules/.bin/esbuild src/es-node.ts --bundle --format=esm --external:./lib-node.mjs --platform=node --outfile=dist/es-node.mjs",
+    "esbuild-node-base": "./node_modules/.bin/esbuild src/es-node.ts --bundle --format=esm --external:./src/lib-node.js --platform=node --outfile=dist/es-node.js",
+    "esbuild-web-base": "./node_modules/.bin/esbuild src/es-web.ts --bundle --format=esm --external:./src/lib-web.js --platform=browser --outfile=dist/es-web.js",
     "esbuild-node": "npm run esbuild-node-base -- --sourcemap",
     "esbuild-web": "npm run esbuild-web-base -- --sourcemap",
     "esbuild-node-watch": "npm run esbuild-node-base -- --sourcemap --watch",
     "esbuild-web-watch": "npm run esbuild-web-base -- --sourcemap --watch",
-    "build": "make src/lib-node.mjs src/lib-web.mjs; npm run esbuild-node; npm run esbuild-web; cp src/lib-* dist/; cp src/index.mjs dist/",
+    "es-both": "npm run esbuild-node; npm run esbuild-web",
+    "build": "npm run es-both; make src/lib-node.mjs src/lib-web.mjs; cp src/lib-* dist/; cp src/index.mjs dist/",
     "types": "tsc",
-    "test": "mocha -r ts-node/register **/*.test.*s",
+    "test": "tap --node-arg=--loader=ts-node/esm tests/bindings.test.ts",
     "prepublish": "npm run build"
   },
   "devDependencies": {
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.9.1",
+    "@types/tap": "^15.0.5",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
     "esbuild": "^0.12.28",
     "eslint": "^7.32.0",
     "mocha": "^9.1.1",
+    "tap": "^15.0.9",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.3"
   }

@@ -1,9 +1,7 @@
-import { augmentEsLib, ESLib } from "./augmentlib";
-import { Mod } from "./lib";
+import { augmentEsLib, ESLib } from "./augmentlib.js";
+import { Mod } from "./lib.js";
 
-
-
-function module(): Mod {
+async function module(): Promise<Mod> {
   // @ts-ignore - this will work when it's bundled (this is a web library)
   const mod = await import("./lib-web.js");
   return mod as Mod;
@@ -12,7 +10,7 @@ function module(): Mod {
 export default async function libFactory(): Promise<ESLib> {
   // @ts-ignore - this will work when it's bundled (this is a web library)
   const mod = await module();
-  const libFactory = mod.default
+  const libFactory = mod.default;
   const url = new URL(`./lib-web.data`, import.meta.url);
   const ab = await (await fetch("" + url)).arrayBuffer();
   const Module = {

@@ -6,7 +6,7 @@
 <body>
   <script type="module">
     (async function(){
-      const {default: modP} = await import('./index.mjs')
+      const {default: modP} = await import('./dist/index.mjs')
       const esLib = await modP();
       window.esLib = esLib;
       const p = new esLib.Point(10, 12);

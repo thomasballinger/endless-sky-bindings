@@ -2,14 +2,20 @@
 libjpeg-turbo-2.1.0/
 build
 
+# emscripten-generated
 src/lib-node.js
 src/lib-node.wasm
 src/lib-web.js
 src/lib-web.wasm
 src/lib-web.data
 
+# created when a real-filesystem Endless Sky loader runs
+errors.txt
+
 empty
 node_modules
 
 dist
-!/dist/index.mjs
+
+# a code coverage thing I don't want but node-tap was the easiest to get working
+.nyc_output

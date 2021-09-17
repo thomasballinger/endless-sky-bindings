@@ -100,10 +100,16 @@ src/lib-node.js src/lib-node.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o
 	em++ $(LINKER_FLAGS) $(NODE_LINKER_FLAGS) -o src/lib-node.js
 	./post_compile_js src/lib-node.js
 
-web: demo.html src/lib-web.js src/lib-web.wasm src/lib-web.data index.js
+dist/lib-web.js dist/lib-web.wasm dist/lib-web.data: src/lib-web.js src/lib-web.wasm src/lib-web.data
+	cp src/lib-web.js src/lib-web.wasm src/lib-web.data dist
+
+dist/lib-node.js dist/lib-node.wasm: src/lib-node.js src/lib-node.wasm
+	cp src/lib-node.js src/lib-node.wasm dist
+
+web: demo.html dist/lib-web.js dist/lib-web.wasm dist/lib-web.data dist/index.mjs dist/es-web.js
 	emrun --serve_after_close --serve_after_exit --browser chrome --private_browsing demo.html
 
-node: demo.mjs src/lib-node.js src/lib-node.wasm index.mjs
+node: demo.mjs dist/lib-node.js dist/lib-node.wasm dist/index.mjs dist/es-node.js
 	node --experimental-repl-await demo.mjs
 
 clean-some:

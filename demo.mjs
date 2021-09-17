@@ -1,4 +1,4 @@
-import esLibFactory from "./index.mjs";
+import esLibFactory from "./dist/index.mjs";
 import { inspect } from "util";
 
 const OUTPUT_LINES = 10;

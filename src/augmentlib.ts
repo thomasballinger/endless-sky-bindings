@@ -1,4 +1,4 @@
-import { ESLibRaw, EsSet } from "./lib";
+import { ESLibRaw, EsSet } from "./lib.js";
 
 // TODO dont' divide these like this, just include everything
 // in the types
