@@ -13,3 +13,6 @@ Should get tests running on packed artifact because the bundling+publishing is e
 Should get tests running on Windows, since using the native filesystem means all those inconsistencies are going to happen!
  
 The right way to do the import("../dist/es-lib.js") thing seems to be a plugin https://github.com/evanw/esbuild/issues/456
+(right now the builds just aren't parallel, the web src references the dist location while the node src imports from ./lib-node.js)
+(which is weird right, maybe dynamic import and import resolution are different?
+NOPE it was just broken.

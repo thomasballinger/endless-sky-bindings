@@ -1,6 +1,6 @@
 {
   "name": "endless-sky-bindings",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "JavaScript bindings for Endless Sky C++ code",
   "main": "dist/index",
   "module": "dist/index.mjs",
@@ -16,8 +16,8 @@
   },
   "homepage": "https://github.com/thomasballinger/endless-sky-bindings#readme",
   "scripts": {
-    "esbuild-node-base": "./node_modules/.bin/esbuild src/es-node.ts --bundle --format=esm --external:./src/lib-node.js --platform=node --outfile=dist/es-node.js",
-    "esbuild-web-base": "./node_modules/.bin/esbuild src/es-web.ts --bundle --format=esm --external:./src/lib-web.js --platform=browser --outfile=dist/es-web.js",
+    "esbuild-node-base": "./node_modules/.bin/esbuild src/es-node.ts --bundle --format=esm --external:./dist/lib-node.js --platform=node --outfile=dist/es-node.js",
+    "esbuild-web-base": "./node_modules/.bin/esbuild src/es-web.ts --bundle --format=esm --external:./dist/lib-web.js --platform=browser --outfile=dist/es-web.js",
     "esbuild-node": "npm run esbuild-node-base -- --sourcemap",
     "esbuild-web": "npm run esbuild-web-base -- --sourcemap",
     "esbuild-node-watch": "npm run esbuild-node-base -- --sourcemap --watch",
