@@ -1,6 +1,6 @@
 {
   "name": "endless-sky-bindings",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "JavaScript bindings for Endless Sky C++ code",
   "main": "dist/index",
   "module": "dist/index.mjs",
