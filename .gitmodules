@@ -1,3 +1,4 @@
 [submodule "endless-sky"]
 	path = endless-sky
 	url = git@github.com:endless-sky/endless-sky.git
+	ignore = dirty
