@@ -59,7 +59,7 @@ EMSCRIPTEN_BINDINGS(DataNode) {
     .function("Value", (double(DataNode::*)(int) const)&DataNode::Value)
     .function("Token", &DataNode::Token)
     .function("IsNumber", (bool(DataNode::*)(int) const)&DataNode::IsNumber)
-    .function("HasChildren", &DataNode::Size)
+    .function("HasChildren", &DataNode::HasChildren)
     .function("PrintTrace", &DataNode::PrintTrace)
     .function("children", optional_override(
             [](DataNode& this_) {
