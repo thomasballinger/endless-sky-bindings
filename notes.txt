@@ -9,3 +9,7 @@ How do you make requiring this not need the extra file path in
 Check Observable after publishing!
 
 Should get tests running on packed artifact because the bundling+publishing is error-prone
+
+Should get tests running on Windows, since using the native filesystem means all those inconsistencies are going to happen!
+ 
+The right way to do the import("../dist/es-lib.js") thing seems to be a plugin https://github.com/evanw/esbuild/issues/456
