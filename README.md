@@ -1,16 +1,20 @@
 # JavaScript bindings for Endless Sky C++ code
 
-Use as a ES6 Module, in node or in the browser with a bundler:
+JavaScript wrapper for the C++ classes in [Endless Sky](https://github.com/endless-sky/endless-sky), compiled to JavaScript + WebAssembly by Emscripten.
+
 ~~~
-import esLibFactory from "endless-web-bindings";
+npm install endless-sky-bindings
+~~~
 
-(async function() {
-  const esLib = await esLibFactory();
 
-  // optional, loads game data which is useful for
-  // getting stats of ships with outfits
-  esLib.GameDataBeginLoad([]);
+## Usage examples
 
+Use as a ES6 Module in node:
+~~~
+import libFactory from "endless-sky-bindings/dist/es-node.js";
+
+(async function () {
+  const esLib = await libFactory();
   console.log(new esLib.Point(1, 2));
 })();
 ~~~
@@ -20,7 +24,7 @@ Use in a browser script tag, without a bundler:
 ~~~
 <script type="module">
 (async function() {
-  const {default: esLibFactory} = await import('https://unpkg.com/endless-sky-bindings/index.mjs?module');
+  const {default: esLibFactory} = await import('https://unpkg.com/endless-sky-bindings/dist/es-web.mjs?module');
   const esLib = await esLibFactory();
   esLib.GameDataBeginLoad([]); // optional
   console.log(new esLib.Point(1, 2));
@@ -28,12 +32,11 @@ Use in a browser script tag, without a bundler:
 </script>
 ~~~
 
-
 Use in the node REPL (shown with top-level await which is on by default in node 16, for node <16 use `node --experimental-repl-await`):
 
 ~~~
-> const {default: esLibFactory} = await import('endless-web-bindings');
-> const esLib = await esLibFactory();
+> const {default: libFactory} = await import('endless-sky-bindings/dist/es-node.js');
+> const esLib = await libFactory();
 > p = new esLib.Point(1, 2));
 Point {}
 > p.X();

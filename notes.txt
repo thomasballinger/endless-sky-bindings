@@ -1,11 +1,9 @@
-Currently this library bundles data (not images I hope) in a virtual filesystem and when you load eslib it's already loaded these files.
+Do the TypeScript types work? Need to check.
 
-I want to make loading eslib take arguments of --resources and --config (maybe just accept argv args) so that it can be used for parsing.
+The two builds now work pretty differently: the node build uses the native filesystem!
 
-That means the node build needs to use the native filesytem.
+How do you make requiring this not need the extra file path in
 
-Let's make two builds that work pretty differently. They can use the same interface, but node always uses the native filesystem and the browser always uses the virtual emscripten one. The entry points should be named differently eventually.
+    import {libFactory} from 'endless-sky-bindings/dist/es-node.js'
 
-Then we need (yet again, it's like the third time I've written this) loading shims create temporary resources and config directories. Hm, maybe just copy these out of the vs code extension.
-
-Try to copy the Python bindings in design where appropriate.
+Check Observable after publishing!

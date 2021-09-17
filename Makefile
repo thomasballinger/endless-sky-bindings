@@ -8,13 +8,17 @@ test: node web
 	wget https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/2.1.0.tar.gz
 libjpeg-turbo-2.1.0: 2.1.0.tar.gz
 	tar xzvf 2.1.0.tar.gz
+# workaround for https://github.com/emscripten-core/emscripten/issues/13551
+libjpeg-turbo-2.1.0/package.json:
+	echo '{ "type": "commonjs" }' > $@
 # | means libjpeg-turbo-2.1.0 is a "order-only prerequisite" so creating the file doesn't invalidate the dir
-libjpeg-turbo-2.1.0/libturbojpeg.a: | libjpeg-turbo-2.1.0
+libjpeg-turbo-2.1.0/libturbojpeg.a: | libjpeg-turbo-2.1.0 libjpeg-turbo-2.1.0/package.json
+libjpeg-turbo-2.1.0/libturbojpeg.a: | libjpeg-turbo-2.1.0 libjpeg-turbo-2.1.0/package.json
 ifndef EMSCRIPTEN_ENV
 	$(error "emmake is not available, activate the emscripten env first")
 endif
 	cd libjpeg-turbo-2.1.0; emcmake cmake -G"Unix Makefiles" -DWITH_SIMD=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev
-	cd libjpeg-turbo-2.1.0; emmake make
+	cd libjpeg-turbo-2.1.0; emmake $(MAKE)
 
 COMMON_FLAGS = -s USE_SDL=2\
 	-s USE_LIBPNG=1\
@@ -27,7 +31,7 @@ CFLAGS = $(COMMON_FLAGS)\
 	-Wold-style-cast\
 	-DES_GLES\
 	-DES_NO_THREADS\
-	-gsource-map\
+	-g\
 	-I libjpeg-turbo-2.1.0\
 
 CPPS := $(shell ls endless-sky/source/*.cpp) $(shell ls endless-sky/source/text/*.cpp)
@@ -38,7 +42,7 @@ TEMP := $(subst endless-sky/source/,build/emcc/,$(CPPS_EXCEPT_MAIN))
 OBJS_EXCEPT_MAIN := $(subst .cpp,.o,$(TEMP))
 HEADERS := $(shell ls endless-sky/source/*.h*) $(shell ls endless-sky/source/text/*.h*) libjpeg-turbo-2.1.0/libturbojpeg.a
 
-build/emcc/%.o: endless-sky/source/%.cpp
+build/emcc/%.o: endless-sky/source/%.cpp libjpeg-turbo-2.1.0/libturbojpeg.a
 ifndef EMSCRIPTEN_ENV
 	$(error "emmake is not available, activate the emscripten env first")
 endif
@@ -77,6 +81,7 @@ LINKER_FLAGS = -s EXPORT_ES6=1\
 		-s LLD_REPORT_UNDEFINED\
 		-s NO_DISABLE_EXCEPTION_CATCHING\
 		-s ALLOW_MEMORY_GROWTH=1\
+		-gsource-map\
 
 # The browser bundles data with it!
 BROWSER_LINKER_FLAGS = --preload-file endless-sky/data@data\
@@ -93,10 +98,10 @@ empty:
 	mkdir -p empty
 	touch empty/empty
 
-src/lib-web.js src/lib-web.wasm src/lib-web.data: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0 empty
+src/lib-web.js src/lib-web.wasm src/lib-web.data: $(OBJS) $(HEADERS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0 empty
 	em++ $(LINKER_FLAGS) $(BROWSER_LINKER_FLAGS) -o src/lib-web.js
 
-src/lib-node.js src/lib-node.wasm: $(OBJS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0
+src/lib-node.js src/lib-node.wasm: $(OBJS) $(HEADERS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0
 	em++ $(LINKER_FLAGS) $(NODE_LINKER_FLAGS) -o src/lib-node.js
 	./post_compile_js src/lib-node.js
 
@@ -105,12 +110,6 @@ dist/lib-web.js dist/lib-web.wasm dist/lib-web.data: src/lib-web.js src/lib-web.
 
 dist/lib-node.js dist/lib-node.wasm: src/lib-node.js src/lib-node.wasm
 	cp src/lib-node.js src/lib-node.wasm dist
-
-web: demo.html dist/lib-web.js dist/lib-web.wasm dist/lib-web.data dist/index.mjs dist/es-web.js
-	emrun --serve_after_close --serve_after_exit --browser chrome --private_browsing demo.html
-
-node: demo.mjs dist/lib-node.js dist/lib-node.wasm dist/index.mjs dist/es-node.js
-	node --experimental-repl-await demo.mjs
 
 clean-some:
 	rm -rf lib-web.js lib-web.wasm src/lib-node.js src/lib-node.wasm

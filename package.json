@@ -25,8 +25,10 @@
     "es-both": "npm run esbuild-node; npm run esbuild-web",
     "build": "npm run es-both; make src/lib-node.mjs src/lib-web.mjs; cp src/lib-* dist/; cp src/index.mjs dist/",
     "types": "tsc",
-    "test": "tap --node-arg=--loader=ts-node/esm tests/bindings.test.ts",
-    "prepublish": "npm run build"
+    "test": "tap --no-check-coverage --node-arg=--loader=ts-node/esm tests/bindings.test.ts",
+    "prepublish": "npm run build",
+    "web-demo": "emrun --serve_after_close --serve_after_exit --browser chrome --private_browsing demo.html",
+    "node-demo": "node --experimental-repl-await demo.mjs"
   },
   "devDependencies": {
     "@types/mocha": "^9.0.0",

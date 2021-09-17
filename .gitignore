@@ -5,9 +5,11 @@ build
 # emscripten-generated
 src/lib-node.js
 src/lib-node.wasm
+src/lib-node.wasm.map
 src/lib-web.js
 src/lib-web.wasm
 src/lib-web.data
+src/lib-web.wasm.map
 
 # created when a real-filesystem Endless Sky loader runs
 errors.txt
@@ -19,3 +21,6 @@ dist
 
 # a code coverage thing I don't want but node-tap was the easiest to get working
 .nyc_output
+
+# all the normal stuff, add whatever here
+.vscode
