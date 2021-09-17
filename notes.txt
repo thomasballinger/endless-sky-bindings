@@ -7,3 +7,5 @@ How do you make requiring this not need the extra file path in
     import {libFactory} from 'endless-sky-bindings/dist/es-node.js'
 
 Check Observable after publishing!
+
+Should get tests running on packed artifact because the bundling+publishing is error-prone

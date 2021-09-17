@@ -1,6 +1,6 @@
 {
   "name": "endless-sky-bindings",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "description": "JavaScript bindings for Endless Sky C++ code",
   "main": "dist/index",
   "module": "dist/index.mjs",
@@ -23,7 +23,7 @@
     "esbuild-node-watch": "npm run esbuild-node-base -- --sourcemap --watch",
     "esbuild-web-watch": "npm run esbuild-web-base -- --sourcemap --watch",
     "es-both": "npm run esbuild-node; npm run esbuild-web",
-    "build": "npm run es-both; make src/lib-node.mjs src/lib-web.mjs; cp src/lib-* dist/; cp src/index.mjs dist/",
+    "build": "npm run es-both; make src/lib-node.js src/lib-web.js; cp src/lib-* dist/; cp src/index.mjs dist/",
     "types": "tsc",
     "test": "tap --no-check-coverage --node-arg=--loader=ts-node/esm tests/bindings.test.ts",
     "prepublish": "npm run build",
