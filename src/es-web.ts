@@ -4,7 +4,7 @@ import { Mod } from "./lib.js";
 async function module(): Promise<Mod> {
   // @ts-ignore - this will work when it's bundled (this is a web library)
   const mod = await import("../dist/lib-web.js");
-  return mod as unknown as Mod;
+  return (mod as unknown) as Mod;
 }
 
 export default async function libFactory(): Promise<ESLib> {
@@ -25,7 +25,7 @@ export default async function libFactory(): Promise<ESLib> {
   return augmentEsLib(esLib);
 }
 
-export async function loadedEsLib(loadArgs: string[]): Promise<ESLib> {
+export async function loadedEsLib(loadArgs: string[] = []): Promise<ESLib> {
   const esLib = await libFactory();
   const augmented = augmentEsLib(esLib);
 

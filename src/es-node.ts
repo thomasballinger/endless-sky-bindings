@@ -19,7 +19,7 @@ export async function libFactory(): Promise<ESLib> {
 }
 export default libFactory;
 
-export async function loadedEsLib(loadArgs: string[]): Promise<ESLib> {
+export async function loadedEsLib(loadArgs: string[] = []): Promise<ESLib> {
   const esLib = await libFactory();
 
   withPreparedFilesystem(
