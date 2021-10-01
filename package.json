@@ -23,9 +23,11 @@
     "esbuild-node-watch": "npm run esbuild-node-base -- --sourcemap --watch",
     "esbuild-web-watch": "npm run esbuild-web-base -- --sourcemap --watch",
     "es-both": "npm run esbuild-node; npm run esbuild-web",
-    "build": "npm run es-both; make src/lib-node.js src/lib-web.js; cp src/lib-* dist/; cp src/index.mjs dist/",
+    "build": "npm run es-both && make src/lib-node.js src/lib-web.js && cp src/lib-* dist/ && cp src/index.mjs dist/",
+    "build-node": "npm run esbuild-node && make src/lib-node.js && cp src/lib-* dist/",
     "types": "tsc",
-    "test": "tap --no-check-coverage --node-arg=--loader=ts-node/esm tests/bindings.test.ts",
+    "test": "tap --no-check-coverage --node-arg=--loader=ts-node/esm tests/*",
+    "test-debug": "tap --node-arg=--inspect-brk --debug -T --no-check-coverage --node-arg=--loader=ts-node/esm tests/*",
     "prepublish": "npm run build",
     "web-demo": "emrun --serve_after_close --serve_after_exit --browser chrome --private_browsing demo.html",
     "node-demo": "node --experimental-repl-await demo.mjs"

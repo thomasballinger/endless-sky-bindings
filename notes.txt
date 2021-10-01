@@ -6,13 +6,14 @@ How do you make requiring this not need the extra file path in
 
     import {libFactory} from 'endless-sky-bindings/dist/es-node.js'
 
-Check Observable after publishing!
-
 Should get tests running on packed artifact because the bundling+publishing is error-prone
 
 Should get tests running on Windows, since using the native filesystem means all those inconsistencies are going to happen!
  
 The right way to do the import("../dist/es-lib.js") thing seems to be a plugin https://github.com/evanw/esbuild/issues/456
-(right now the builds just aren't parallel, the web src references the dist location while the node src imports from ./lib-node.js)
-(which is weird right, maybe dynamic import and import resolution are different?
-NOPE it was just broken.
+(it should be import("./es-lib.js) and from * as eslib import "./es-lib.js")
+
+It turns out NODERAWFS doesn't quite work yet: https://github.com/emscripten-core/emscripten/issues/7487
+I've opened a PR to fix, but in the meantime this library should use NODEFS and manually mount things.
+- mount resources at /resources or something
+- mount config at /config or something

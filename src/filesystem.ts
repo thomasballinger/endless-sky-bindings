@@ -7,6 +7,7 @@ import {
   symlinkSync,
   unlinkSync,
   writeFileSync,
+  readdirSync,
 } from "fs";
 import * as path from "path";
 
@@ -41,7 +42,14 @@ export async function withPreparedFilesystem<T>(
       throw new Error("bad pluginDir path: " + options.pluginDir);
     }
     tmpPlugin = path.join(configDir, "plugins", TEMP_PLUGIN_NAME);
+    console.log(
+      "symlinking",
+      path.resolve(options.pluginDir),
+      "to link to, tmpPlugin"
+    );
     symlinkSync(path.resolve(options.pluginDir), tmpPlugin);
+    console.log(tmpPlugin, readdirSync(tmpPlugin));
+    console.log(tmpPlugin + "/data", readdirSync(tmpPlugin + "/data"));
   }
   if (!options.resources) {
     // if no resources, create blank one!
@@ -61,13 +69,30 @@ export async function withPreparedFilesystem<T>(
       tmpPlugin,
       resources: tmpResources || options.resources!,
     });
+  } catch (e) {
+    console.log(
+      "Oh no, the callback passed to withPreparedFilesystem threw an error:",
+      e
+    );
   } finally {
+    return;
     if (options.pluginDir) {
+      console.log(
+        "cleaning up pluginDir",
+        path.join(configDir, "plugins", TEMP_PLUGIN_NAME)
+      );
+      console.log(
+        readdirSync(path.join(configDir, "plugins", TEMP_PLUGIN_NAME))
+      );
       unlinkSync(path.join(configDir, "plugins", TEMP_PLUGIN_NAME));
     }
+    console.log("cleaning up configDir", configDir);
     rmdirSync(configDir, { recursive: true });
+    console.log("removed", configDir);
     if (tmpResources) {
+      console.log("cleaning up tmpResources", configDir);
       rmdirSync(tmpResources, { recursive: true });
+      console.log("removed", configDir);
     }
   }
 }

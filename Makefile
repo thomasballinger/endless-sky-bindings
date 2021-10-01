@@ -1,6 +1,7 @@
 # This Makefile builds Emscripten outputs dist/lib-web.js and dist/lib-node.js
 
 EMSCRIPTEN_ENV := $(shell command -v emmake 2> /dev/null)
+CXX := $(shell command -v ccache 2> /dev/null > /dev/null && echo ccache em++ || echo em++)
 
 all: src/lib-web.js src/lib-node.js
 test: node web
@@ -25,12 +26,13 @@ COMMON_FLAGS = -s USE_SDL=2\
 
 CFLAGS = $(COMMON_FLAGS)\
 	-Duuid_generate_random=uuid_generate\
-	-std=c++11\
+	-std=c++17\
 	-Wall\
 	-Werror\
 	-Wold-style-cast\
 	-DES_GLES\
 	-DES_NO_THREADS\
+	-DES_NODE_BINDINGS\
 	-g\
 	-I libjpeg-turbo-2.1.0\
 
@@ -47,21 +49,21 @@ ifndef EMSCRIPTEN_ENV
 	$(error "emmake is not available, activate the emscripten env first")
 endif
 	@mkdir -p build/emcc/text
-	em++ $(CFLAGS) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 build/emcc/text/%.o: endless-sky/source/text/%.cpp
 ifndef EMSCRIPTEN_ENV
 	$(error "emmake is not available, activate the emscripten env first")
 endif
 	@mkdir -p build/emcc/text
-	em++ $(CFLAGS) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 build/emcc/datanode-factory.o: endless-sky/tests/src/helpers/datanode-factory.cpp
 ifndef EMSCRIPTEN_ENV
 	$(error "emmake is not available, activate the emscripten env first")
 endif
 	@mkdir -p build/emcc
-	em++ $(CFLAGS) -c endless-sky/tests/src/helpers/datanode-factory.cpp -I endless-sky/tests/include -o build/emcc/datanode-factory.o
+	$(CXX) $(CFLAGS) -c endless-sky/tests/src/helpers/datanode-factory.cpp -I endless-sky/tests/include -o build/emcc/datanode-factory.o
 
 patch: patch.diff
 	# patch.diff should correspond to https://github.com/thomasballinger/endless-web/compare/master...browser-support
@@ -91,18 +93,19 @@ BROWSER_LINKER_FLAGS = --preload-file endless-sky/data@data\
 		--preload-file endless-sky/credits.txt@credits.txt\
 
 # Node does not have data bundled with it, you need to point it at some resources
+# Node's NODERAWFS doesn't work yet for listing directories, so manually mount for now.
 NODE_LINKER_FLAGS = --pre-js pre_js.js\
-		-s NODERAWFS=1\
+	-l nodefs.js\
 
 empty:
 	mkdir -p empty
 	touch empty/empty
 
 src/lib-web.js src/lib-web.wasm src/lib-web.data: $(OBJS) $(HEADERS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0 empty
-	em++ $(LINKER_FLAGS) $(BROWSER_LINKER_FLAGS) -o src/lib-web.js
+	$(CXX) $(LINKER_FLAGS) $(BROWSER_LINKER_FLAGS) -o src/lib-web.js
 
 src/lib-node.js src/lib-node.wasm: $(OBJS) $(HEADERS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0
-	em++ $(LINKER_FLAGS) $(NODE_LINKER_FLAGS) -o src/lib-node.js
+	$(CXX) $(LINKER_FLAGS) $(NODE_LINKER_FLAGS) -o src/lib-node.js
 	./post_compile_js src/lib-node.js
 
 dist/lib-web.js dist/lib-web.wasm dist/lib-web.data: src/lib-web.js src/lib-web.wasm src/lib-web.data

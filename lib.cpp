@@ -1,9 +1,11 @@
 // quick_example.cpp
 #include <emscripten/bind.h>
+#include <emscripten.h>
 
 #include "endless-sky/source/Account.h"
 #include "endless-sky/source/Angle.h"
 #include "endless-sky/source/DataNode.h"
+#include "endless-sky/source/Files.h"
 #include "endless-sky/source/GameData.h"
 #include "endless-sky/source/Point.h"
 #include "endless-sky/source/Random.h"
@@ -100,6 +102,40 @@ EMSCRIPTEN_BINDINGS(Dictionary) {
         ))
     ;
 }
+
+
+// source/Files
+EMSCRIPTEN_BINDINGS(Files) {
+  class_<Files>("Files");
+  function("_FilesRecursiveList", select_overload<std::vector<std::string>(const std::string&)>(&Files::RecursiveList));
+  function("_FilesList", &Files::List);
+  function("_FilesListDirectories", &Files::ListDirectories);
+  function("FilesRecursiveList", optional_override([](std::string toMount) {
+    std::string mountPoint = "/tmpFilesMount";
+    EM_ASM({
+      const mountPoint = UTF8ToString($1)
+      console.log(1);
+      FS.mkdir(mountPoint);
+      console.log(2);
+      FS.mount(NODEFS, { root: UTF8ToString($0)}, mountPoint);
+      console.log(3);
+    }, toMount.c_str(), mountPoint.c_str());
+    auto list = Files::RecursiveList("/tmpFilesMount");
+    EM_ASM({
+      console.log(4);
+      const mountPoint = UTF8ToString($0)
+      console.log(5);
+      FS.unmount(mountPoint);
+      console.log(6);
+      FS.rmdir(mountPoint);
+    }, mountPoint.c_str());
+    for (auto &s : list) {
+      s.replace(0, mountPoint.size(), toMount);
+    }
+    return list;
+  }));
+}
+
 
 // TODO make these static methods and properties on GameData
 // source/GameData

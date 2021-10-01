@@ -14,6 +14,7 @@ export type EsSet<T> = {
   Get(k: string): T;
   keys(): Vector<string>;
   values(): Vector<T>;
+  toObj(): Record<string, T>;
 };
 
 export type Account = {
@@ -63,6 +64,10 @@ export type ESLibRaw = {
   Point: { new (x: number, y: number): Point };
   Dictionary: { new (): Dictionary };
   Ship: { new (d: DataNode): Ship };
+  GameDataShips(): EsSet<Ship>;
+  FilesRecursiveList(path: string): Vector<string>;
+  FilesList(path: string): Vector<string>;
+  FilesDirectoriesList(path: string): Vector<string>;
 };
 
 // Emscripten Module object https://emscripten.org/docs/api_reference/module.html
@@ -76,4 +81,3 @@ export type ModuleInitializer = {
 export type Mod = {
   default(module?: ModuleInitializer): ESLibRaw;
 };
-
