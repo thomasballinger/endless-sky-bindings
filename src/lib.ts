@@ -67,7 +67,7 @@ export type ESLibRaw = {
   GameDataShips(): EsSet<Ship>;
   FilesRecursiveList(path: string): Vector<string>;
   FilesList(path: string): Vector<string>;
-  FilesDirectoriesList(path: string): Vector<string>;
+  FilesListDirectories(path: string): Vector<string>;
 };
 
 // Emscripten Module object https://emscripten.org/docs/api_reference/module.html

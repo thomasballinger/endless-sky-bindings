@@ -13,7 +13,6 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const defaultResources = path.join(__dirname, "endless-sky");
 
 export async function libFactory(): Promise<ESLib> {
-  console.log("libFactory start");
   const libFactory = mod.default;
   const esLib = await libFactory();
   return augmentEsLib(esLib);
@@ -28,7 +27,7 @@ export async function loadedEsLib(loadArgs: string[] = []): Promise<ESLib> {
   withPreparedFilesystem(
     { resources: defaultResources },
     async ({ config, resources, tmpPlugin }) => {
-      // TODO mount node filesystem right here!
+      // TODO mount node filesystem right here! (if node is to work)
       console.log("resource from withPreparedFilesystem are", resources);
       console.log(resources, fs.existsSync(resources));
       console.log("config from withPreparedFilesystem are", config);
@@ -104,20 +103,11 @@ export async function nodeLoadedEsLib(
     throw new Error("not implemented");
   }
 
-  console.log("awaiting...");
   const esLib = await libFactory();
-  console.log("got esLib");
 
   return withPreparedFilesystem(
     { resources, pluginDir: options.pluginDir },
     async ({ config, resources, tmpPlugin }) => {
-      console.log("resource from withPreparedFilesystem are", resources);
-      console.log(resources, fs.existsSync(resources));
-      console.log("config from withPreparedFilesystem are", config);
-      console.log(config, fs.existsSync(config));
-
-      console.log("running the callback, about to load with args...");
-      console.log(resources, config);
       esLib.GameDataBeginLoad([
         "--resources",
         resources,
@@ -125,7 +115,6 @@ export async function nodeLoadedEsLib(
         config,
         "-s",
       ]);
-      console.log("Loaded! :)");
       LOADED = true;
       return esLib;
     }

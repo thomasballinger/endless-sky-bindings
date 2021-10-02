@@ -74,6 +74,7 @@ export async function withPreparedFilesystem<T>(
       "Oh no, the callback passed to withPreparedFilesystem threw an error:",
       e
     );
+    throw e;
   } finally {
     return;
     if (options.pluginDir) {
