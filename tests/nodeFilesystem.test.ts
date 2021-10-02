@@ -17,6 +17,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const defaultResources = path.join(__dirname, "../endless-sky");
 const examplePlugin = path.join(__dirname, "./exampleplugin");
 
+/*
 (async () => {
   const esLib = await libFactory();
 
@@ -44,6 +45,7 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
     t.end();
   });
 })();
+*/
 
 (async () => {
   const esLib = await nodeLoadedEsLib({
@@ -58,6 +60,7 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
     assert.deepEqual(account.Credits(), 100);
     t.end();
   });
+  */
 
   tap.test("Plugin is loaded", (t) => {
     console.log(esLib.GameDataShips());
@@ -68,5 +71,4 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
     assert.strictEqual(canoe.ModelName(), "Canoe");
     t.end();
   });
-*/
 })();

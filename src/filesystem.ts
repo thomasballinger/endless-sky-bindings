@@ -57,6 +57,7 @@ export async function withPreparedFilesystem<T>(
     mkdirSync(path.join(tmpResources, "data"));
     mkdirSync(path.join(tmpResources, "sounds"));
     mkdirSync(path.join(tmpResources, "images"));
+    mkdirSync(path.join(tmpResources, "plugins"));
     writeFileSync(
       path.join(tmpResources, "credits.txt"),
       "mostly MZ but lots of help\n"
@@ -76,7 +77,7 @@ export async function withPreparedFilesystem<T>(
     );
     throw e;
   } finally {
-    return;
+    /*
     if (options.pluginDir) {
       console.log(
         "cleaning up pluginDir",
@@ -95,5 +96,6 @@ export async function withPreparedFilesystem<T>(
       rmdirSync(tmpResources, { recursive: true });
       console.log("removed", configDir);
     }
+    */
   }
 }
