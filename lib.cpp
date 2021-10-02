@@ -103,63 +103,12 @@ EMSCRIPTEN_BINDINGS(Dictionary) {
     ;
 }
 
-EM_JS(void, nodeMountFS, (const char* toMount_, const char* mountPoint_), {
-  const mountPoint = UTF8ToString(mountPoint_);
-  const toMount = UTF8ToString(toMount_);
-  console.log('mkdir and mount', mountPoint);
-  FS.mkdir(mountPoint);
-  FS.mount(NODEFS, { root: toMount}, mountPoint);
-  console.log('mounted', toMount, 'at', mountPoint);
-});
-
-EM_JS(void, nodeUnmountFS, (const char* mountPoint_), {
-  const mountPoint = UTF8ToString(mountPoint_);
-  console.log('unmounting', mountPoint);
-  FS.unmount(mountPoint);
-  console.log('unmounted', mountPoint);
-  console.log('rmdir', mountPoint);
-  FS.rmdir(mountPoint);
-  console.log('rmdired', mountPoint);
-});
-
 // source/Files
 EMSCRIPTEN_BINDINGS(Files) {
   class_<Files>("Files");
-  function("_FilesRecursiveList", select_overload<std::vector<std::string>(const std::string&)>(&Files::RecursiveList));
-  function("FilesRecursiveList", optional_override([](std::string toMount) {
-    std::string mountPoint = "/tmpFilesMount";
-    nodeMountFS(toMount.c_str(), mountPoint.c_str());
-    auto list = Files::RecursiveList(mountPoint);
-    nodeUnmountFS(mountPoint.c_str());
-    for (auto &s : list) {
-      s.replace(0, mountPoint.size(), toMount);
-    }
-    return list;
-  }));
-  function("_FilesList", &Files::List);
-  function("FilesList", optional_override([](std::string toMount) {
-    std::string mountPoint = "/tmpFilesMount";
-    nodeMountFS(toMount.c_str(), mountPoint.c_str());
-    std::cout << "calling Files::List(mountPoint)" << std::endl;
-    auto list = Files::List(mountPoint);
-    std::cout << "finished call" << std::endl;
-    nodeUnmountFS(mountPoint.c_str());
-    for (auto &s : list) {
-      s.replace(0, mountPoint.size(), toMount);
-    }
-    return list;
-  }));
-  function("_FilesListDirectories", &Files::ListDirectories);
-  function("FilesListDirectories", optional_override([](std::string toMount) {
-    std::string mountPoint = "/tmpFilesMount";
-    nodeMountFS(toMount.c_str(), mountPoint.c_str());
-    auto list = Files::ListDirectories(mountPoint);
-    nodeUnmountFS(mountPoint.c_str());
-    for (auto &s : list) {
-      s.replace(0, mountPoint.size(), toMount);
-    }
-    return list;
-  }));
+  function("FilesRecursiveList", select_overload<std::vector<std::string>(const std::string&)>(&Files::RecursiveList));
+  function("FilesList", &Files::List);
+  function("FilesListDirectories", &Files::ListDirectories);
 }
 
 

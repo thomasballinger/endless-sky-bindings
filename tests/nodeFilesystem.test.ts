@@ -17,10 +17,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const defaultResources = path.join(__dirname, "../endless-sky");
 const examplePlugin = path.join(__dirname, "./exampleplugin");
 
-/*
 (async () => {
   const esLib = await libFactory();
 
+  /*
   tap.test("FilesRecursiveList", (t) => {
     // relative to the node cwd location?
     const files = esLib.FilesRecursiveList("tests");
@@ -37,6 +37,7 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
     assert.strictEqual(files.toArr().length > 2, true);
     t.end();
   });
+  */
   tap.test("FilesListDirectories", (t) => {
     // relative to the node cwd location?
     const files = esLib.FilesListDirectories(".");
@@ -45,8 +46,8 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
     t.end();
   });
 })();
-*/
 
+/*
 (async () => {
   const esLib = await nodeLoadedEsLib({
     pluginDir: examplePlugin,
@@ -62,6 +63,7 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
   });
   */
 
+/*
   tap.test("Plugin is loaded", (t) => {
     console.log(esLib.GameDataShips());
     console.log(esLib.GameDataShips().Get("Canoe"));
@@ -72,3 +74,4 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
     t.end();
   });
 })();
+*/
