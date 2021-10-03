@@ -20,7 +20,6 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
 (async () => {
   const esLib = await libFactory();
 
-  /*
   tap.test("FilesRecursiveList", (t) => {
     // relative to the node cwd location?
     const files = esLib.FilesRecursiveList("tests");
@@ -37,23 +36,20 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
     assert.strictEqual(files.toArr().length > 2, true);
     t.end();
   });
-  */
   tap.test("FilesListDirectories", (t) => {
     // relative to the node cwd location?
-    const files = esLib.FilesListDirectories(".");
-    assert.strictEqual(files.toArr().length > 0, true);
-    assert.strictEqual(files.toArr().includes("./tests/"), true);
+    const files = esLib.FilesListDirectories(__dirname);
+    assert.strictEqual(files.toArr().length === 1, true);
+    assert.strictEqual(files.toArr()[0].includes("exampleplugin"), true);
     t.end();
   });
 })();
 
-/*
 (async () => {
   const esLib = await nodeLoadedEsLib({
     pluginDir: examplePlugin,
   });
 
-  /*
   tap.test("Normal code works", (t) => {
     const account = new esLib.Account();
     assert.deepEqual(account.Credits(), 0);
@@ -61,9 +57,7 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
     assert.deepEqual(account.Credits(), 100);
     t.end();
   });
-  */
 
-/*
   tap.test("Plugin is loaded", (t) => {
     console.log(esLib.GameDataShips());
     console.log(esLib.GameDataShips().Get("Canoe"));
@@ -74,4 +68,3 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
     t.end();
   });
 })();
-*/

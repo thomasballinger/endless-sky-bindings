@@ -95,7 +95,8 @@ BROWSER_LINKER_FLAGS = --preload-file endless-sky/data@data\
 # Node does not have data bundled with it, you need to point it at some resources
 # Node's NODERAWFS doesn't work yet for listing directories, so manually mount for now.
 NODE_LINKER_FLAGS = --pre-js pre_js.js\
-	-l nodefs.js\
+	-s NODERAWFS=1\
+	#-l nodefs.js\
 
 empty:
 	mkdir -p empty
