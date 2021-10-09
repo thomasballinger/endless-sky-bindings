@@ -6,6 +6,7 @@ mjs_file=$1
 
 SED="sed -i.bak"
 
+$SED "1s|^|// GENERATED FILE - DO NOT EDIT \n|" $mjs_file
 $SED "s/require(['\"]path['\"])/imported_path/g" $mjs_file
 $SED "s/require(['\"]fs['\"])/imported_fs/g" $mjs_file
 $SED "s/__dirname/new URL(import.meta.url)/g" $mjs_file

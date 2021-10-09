@@ -4,3 +4,5 @@ ship "Canoe"
 		"cost" 18
 		"drag" 1.7
 	description "Although not space-ready, sometimes you just need to get across the river."
+
+asdf

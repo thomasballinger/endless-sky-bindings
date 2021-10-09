@@ -1,0 +1,20 @@
+{
+  "name": "endless-sky-bindings-tests",
+  "version": "1.0.0",
+  "description": "Separate package so these can be installed in CI to test on other platforms.",
+  "type": "module",
+  "scripts": {
+    "test": "tap --no-check-coverage --node-arg=--loader=ts-node/esm ./*.test.*",
+    "test-debug": "tap --node-arg=--inspect-brk --debug -T --no-check-coverage --node-arg=--loader=ts-node/esm ./*.test.*"
+  },
+  "author": "",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@types/node": "^16.9.1",
+    "@types/tap": "^15.0.5",
+    "endless-sky-bindings": "file:../",
+    "tap": "^15.0.9",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
+  }
+}

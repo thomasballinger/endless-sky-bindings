@@ -3,7 +3,7 @@ import { Mod } from "./lib.js";
 
 async function module(): Promise<Mod> {
   // @ts-ignore - this will work when it's bundled (this is a web library)
-  const mod = await import("../dist/lib-web.js");
+  const mod = await import("./lib-web.js");
   return (mod as unknown) as Mod;
 }
 

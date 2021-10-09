@@ -77,7 +77,6 @@ export async function withPreparedFilesystem<T>(
     );
     throw e;
   } finally {
-    /*
     if (options.pluginDir) {
       console.log(
         "cleaning up pluginDir",
@@ -96,6 +95,5 @@ export async function withPreparedFilesystem<T>(
       rmdirSync(tmpResources, { recursive: true });
       console.log("removed", configDir);
     }
-    */
   }
 }

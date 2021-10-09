@@ -47,21 +47,18 @@ Point {}
  
 ## Wrapped classes
 
-See [lib.cpp](./lib.cpp) for which classes are wrapped. It's not hard to add more, but there are some limitations:
-* only one constructor overload can be directly exposed
-* int64 conversions require manual wrapping to convert to int
-* I haven't figured out templates
+See [lib.cpp](./lib.cpp) for which classes are wrapped. It's not hard to add more. Reading the [Endless Sky source](https://github.com/endless-sky/endless-sky) for respective methods is the only documentation available.
 
 ## How this works
 
 This repository has a specific commit of Endless Sky as a submodule. A patch (patch.diff) is applied to it, mostly to make it compile with the Emscripten toolchain. This patch is based on the changes made to Endless Sky in the [Endless Web](https://github.com/thomasballinger/endless-web) fork.
 
-These modified Endless Sky C++ files are compiled with Emscripten with bindings provided by the Emscripten [embind](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html) macros in lib.cpp.
+These modified Endless Sky C++ files are compiled with Emscripten with bindings in lib.cpp made possibly by the Emscripten [embind](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html) macros.
 
-These distributed files include core Endless Sky game data but not images or sounds.
+These distributed files include core Endless Sky game data, but not images or sounds.
 
 ## Potential Uses of this library
-These aren't possible yet, but might influence design.
+These aren't all possible yet, but this is the motivation. If you're trying to do something like these, let me know!
 
 * npm-installable command line data parser which exactly mirrors game loading logic
 * live preview of derived properties when making data file changes

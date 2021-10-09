@@ -8,46 +8,118 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        node-version: [14.x]
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        es-build: [continuous]
-      fail-fast: false
+    runs-on: ubuntu-latest
 
-    runs-on: ${{ matrix.os }}
+    env:
+      EM_VERSION: 2.0.31
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: patch endless sky
+        run: make patch
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: ${{ runner.os }}-${{ env.EM_VERSION }}
+      - name: install emsdk
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          ./emsdk/emsdk install ${{ env.EM_VERSION }}
+          ./emsdk/emsdk activate ${{ env.EM_VERSION }}
+      - name: patch emscripten
+        run: |
+          cp emscripten-patch-rawnodefs.diff emsdk/upstream/emscripten/
+          cd emsdk/upstream/emscripten; patch -p1 < emscripten-patch-rawnodefs.diff
+
+      - name: emcc --clear-cache for some reason
+        run: |
+          source emsdk/emsdk_env.sh
+          emcc --clear-cache
+
+      - name: Cache libjpegturbo
+        id: cache-libjpegturbo
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-libjpegturbo
+        with:
+          path: |
+            libjpeg-turbo-2.1.0/
+            2.1.0.tar.gz
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.EM_VERSION }}
+      - name: Cache build directory
+        id: cache-build
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-build
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.EM_VERSION }}
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install Linux runtime dependencies
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+
+      - name: "Set non-legacy env to avoid warning"
+        # https://github.com/emscripten-core/emsdk/issues/862
         run: |
-          sudo rm /etc/apt/sources.list.d/* && sudo dpkg --clear-avail # Speed up installation and get rid of unwanted lists
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libsdl2-2.0-0 libpng16-16 libjpeg-turbo8 libopenal1 libmad0 libglew2.1 libgl1 uuid-runtime
-      - name: Download continuous es Windows
-        if: ${{ matrix.es-build == 'continuous' && matrix.os == 'windows-latest' }}
+          source emsdk/emsdk_env.sh
+          echo "EM_NODE_JS=$EMSDK_NODE" >> $GITHUB_ENV
+          cat $GITHUB_ENV
+
+      - name: Install deps and build library
         run: |
-          Invoke-WebRequest https://github.com/endless-sky/endless-sky/releases/download/continuous/EndlessSky-win64-continuous.zip -OutFile es.zip
-          New-Item es -ItemType Directory
-          Expand-Archive es.zip -DestinationPath es -Force
-          Remove-Item es.zip
-      - name: Download continuous es Mac
-        if: ${{ matrix.es-build == 'continuous' && matrix.os == 'macos-latest' }}
-        run: |
-          wget -q https://github.com/endless-sky/endless-sky/releases/download/continuous/EndlessSky-macOS-continuous.zip
-          unzip EndlessSky-macOS-continuous.zip
-          rm EndlessSky-macOS-continuous.zip
-      - name: Download continuous es Linux
-        if: ${{ matrix.es-build == 'continuous' && matrix.os == 'ubuntu-latest' }}
-        run: |
-          wget -q https://github.com/endless-sky/endless-sky/releases/download/continuous/endless-sky-x86_64-continuous.tar.gz
-          mkdir es
-          tar xzf endless-sky-x86_64-continuous.tar.gz -C es
-      - name: Install dependencies
-        run: npm ci
+          source emsdk/emsdk_env.sh
+          npm ci  # this also runs a build (because that's a prepublish script)
       - run: npm test
+      - run: npm pack
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: artifact
+          path: ./endless-sky-bindings-*.tgz
+
+  test:
+    needs: [build]
+    strategy:
+      matrix:
+        node-version: [14.x]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+
+      - name: test
+        working-directory: ./tests
+        shell: bash
+        run: |
+          npm install
+          echo current directory is
+          pwd
+          echo before installing
+          echo ls .
+          ls
+          echo ls ..
+          ls ..
+          npm install ../*.tgz
+          echo .
+          ls
+          echo ./node_modules
+          ls node_modules
+          echo ./node_modules/endles-sky-bindings
+          ls node_modules/endless-sky-bindings
+          echo ./node_modules/endles-sky-bindings/dist/
+          ls node_modules/endless-sky-bindings/dist/
+          npm test

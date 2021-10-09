@@ -17,3 +17,8 @@ It turns out NODERAWFS doesn't quite work yet: https://github.com/emscripten-cor
 I've opened a PR to fix, but in the meantime this library should use NODEFS and manually mount things.
 - mount resources at /resources or something
 - mount config at /config or something
+
+
+
+Should lib-web.js and lib-node.js, the 400kB files output by emscripten, be in src or dist?
+Shoudl the be referenced in src or dist?

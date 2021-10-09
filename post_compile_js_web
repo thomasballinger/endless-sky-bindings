@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -ex
+
+mjs_file=$1
+
+SED="sed -i.bak"
+
+$SED "1s|^|// GENERATED FILE - DO NOT EDIT \n|" $mjs_file
+rm $mjs_file.bak

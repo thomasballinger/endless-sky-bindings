@@ -1,8 +1,9 @@
-import { nodeLoadedEsLib, libFactory } from "../src/es-node.js";
-import { dirname } from "path";
+import {
+  nodeLoadedEsLib,
+  libFactory,
+} from "endless-sky-bindings/dist/es-node.js";
 import { fileURLToPath } from "url";
 import * as assert from "assert";
-import * as fs from "fs";
 import * as path from "path";
 
 import * as tap from "tap";
@@ -14,7 +15,6 @@ import * as tap from "tap";
 
 // @ts-ignore
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const defaultResources = path.join(__dirname, "../endless-sky");
 const examplePlugin = path.join(__dirname, "./exampleplugin");
 
 (async () => {
@@ -22,25 +22,24 @@ const examplePlugin = path.join(__dirname, "./exampleplugin");
 
   tap.test("FilesRecursiveList", (t) => {
     // relative to the node cwd location?
-    const files = esLib.FilesRecursiveList("tests");
-    assert.strictEqual(files.toArr().length > 3, true);
+    const files = esLib.FilesRecursiveList("exampleplugin");
+    assert.strictEqual(files.toArr().length > 0, true);
     assert.strictEqual(
-      files.toArr().includes("tests/nodeFilesystem.test.ts"),
+      files.toArr().includes("exampleplugin/data/ships.txt"),
       true
     );
     t.end();
   });
   tap.test("FilesList", (t) => {
     // relative to the node cwd location?
-    const files = esLib.FilesList("tests");
+    const files = esLib.FilesList(".");
     assert.strictEqual(files.toArr().length > 2, true);
     t.end();
   });
   tap.test("FilesListDirectories", (t) => {
-    // relative to the node cwd location?
-    const files = esLib.FilesListDirectories(__dirname);
-    assert.strictEqual(files.toArr().length === 1, true);
-    assert.strictEqual(files.toArr()[0].includes("exampleplugin"), true);
+    const files = esLib.FilesListDirectories(".");
+    assert.strictEqual(files.toArr().length > 0, true);
+    assert.strictEqual(files.toArr().includes("./exampleplugin/"), true);
     t.end();
   });
 })();

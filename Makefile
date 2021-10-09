@@ -6,9 +6,9 @@ CXX := $(shell command -v ccache 2> /dev/null > /dev/null && echo ccache em++ ||
 all: src/lib-web.js src/lib-node.js
 test: node web
 2.1.0.tar.gz:
-	wget https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/2.1.0.tar.gz
+	wget -q https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/2.1.0.tar.gz
 libjpeg-turbo-2.1.0: 2.1.0.tar.gz
-	tar xzvf 2.1.0.tar.gz
+	tar xzf 2.1.0.tar.gz
 # workaround for https://github.com/emscripten-core/emscripten/issues/13551
 libjpeg-turbo-2.1.0/package.json:
 	echo '{ "type": "commonjs" }' > $@
@@ -102,12 +102,14 @@ empty:
 	mkdir -p empty
 	touch empty/empty
 
-src/lib-web.js src/lib-web.wasm src/lib-web.data: $(OBJS) $(HEADERS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0 empty
+#TODO once https://github.com/emscripten-core/emscripten/issues/15060 lib-web.js and lib-node.js shouldn't need to be separate
+src/lib-web.js src/lib-web.wasm src/lib-web.data: $(OBJS) $(HEADERS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0 empty post_compile_js_web
 	$(CXX) $(LINKER_FLAGS) $(BROWSER_LINKER_FLAGS) -o src/lib-web.js
+	./post_compile_js_web src/lib-web.js
 
-src/lib-node.js src/lib-node.wasm: $(OBJS) $(HEADERS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0
+src/lib-node.js src/lib-node.wasm: $(OBJS) $(HEADERS) lib.cpp build/emcc/datanode-factory.o libjpeg-turbo-2.1.0 post_compile_js_node
 	$(CXX) $(LINKER_FLAGS) $(NODE_LINKER_FLAGS) -o src/lib-node.js
-	./post_compile_js src/lib-node.js
+	./post_compile_js_node src/lib-node.js
 
 dist/lib-web.js dist/lib-web.wasm dist/lib-web.data: src/lib-web.js src/lib-web.wasm src/lib-web.data
 	cp src/lib-web.js src/lib-web.wasm src/lib-web.data dist

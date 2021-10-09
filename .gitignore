@@ -22,5 +22,8 @@ dist
 # a code coverage thing I don't want but node-tap was the easiest to get working
 .nyc_output
 
+# npm pack output
+endless-sky-bindings-*.tgz
+
 # all the normal stuff, add whatever here
 .vscode

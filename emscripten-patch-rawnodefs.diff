@@ -1,0 +1,230 @@
+diff --git a/src/library_fs.js b/src/library_fs.js
+index 743944dcf..ec2f48970 100644
+--- a/src/library_fs.js
++++ b/src/library_fs.js
+@@ -1073,10 +1073,13 @@ FS.staticInit();` +
+       var stream = FS.createStream({
+         node: node,
+         path: FS.getPath(node),  // we want the absolute path to the node
++        id: node.id,
+         flags: flags,
++        mode: node.mode,
+         seekable: true,
+         position: 0,
+         stream_ops: node.stream_ops,
++        node_ops: node.node_ops,
+         // used by the file family libc calls (fopen, fwrite, ferror, etc.)
+         ungotten: [],
+         error: false
+diff --git a/src/library_nodefs.js b/src/library_nodefs.js
+index 03c050c23..edbf0c3f0 100644
+--- a/src/library_nodefs.js
++++ b/src/library_nodefs.js
+@@ -27,6 +27,11 @@ mergeInto(LibraryManager.library, {
+         "{{{ cDefine('O_TRUNC') }}}": flags["O_TRUNC"],
+         "{{{ cDefine('O_WRONLY') }}}": flags["O_WRONLY"]
+       };
++#if ASSERTIONS
++      // The 0 define must match on both sides, as otherwise we would not
++      // know to add it.
++      assert(NODEFS.flagsForNodeMap["0"] === 0);
++#endif
+     },
+     convertNodeCode: function(e) {
+       var code = e.code;
+@@ -78,10 +83,11 @@ mergeInto(LibraryManager.library, {
+     // This maps the integer permission modes from http://linux.die.net/man/3/open
+     // to node.js-specific file open permission strings at http://nodejs.org/api/fs.html#fs_fs_open_path_flags_mode_callback
+     flagsForNode: function(flags) {
+-      flags &= ~0x200000 /*O_PATH*/; // Ignore this flag from musl, otherwise node.js fails to open the file.
+-      flags &= ~0x800 /*O_NONBLOCK*/; // Ignore this flag from musl, otherwise node.js fails to open the file.
+-      flags &= ~0x8000 /*O_LARGEFILE*/; // Ignore this flag from musl, otherwise node.js fails to open the file.
+-      flags &= ~0x80000 /*O_CLOEXEC*/; // Some applications may pass it; it makes no sense for a single process.
++      flags &= ~{{{ cDefine('O_PATH') }}}; // Ignore this flag from musl, otherwise node.js fails to open the file.
++      flags &= ~{{{ cDefine('O_NONBLOCK') }}}; // Ignore this flag from musl, otherwise node.js fails to open the file.
++      flags &= ~{{{ cDefine('O_LARGEFILE') }}}; // Ignore this flag from musl, otherwise node.js fails to open the file.
++      flags &= ~{{{ cDefine('O_CLOEXEC') }}}; // Some applications may pass it; it makes no sense for a single process.
++      flags &= ~{{{ cDefine('O_DIRECTORY') }}}; // Node.js doesn't need this passed in, it errors.
+       var newFlags = 0;
+       for (var k in NODEFS.flagsForNodeMap) {
+         if (flags & k) {
+@@ -89,7 +95,6 @@ mergeInto(LibraryManager.library, {
+           flags ^= k;
+         }
+       }
+-
+       if (!flags) {
+         return newFlags;
+       } else {
+diff --git a/src/library_noderawfs.js b/src/library_noderawfs.js
+index 1c0dba5e7..7437d2362 100644
+--- a/src/library_noderawfs.js
++++ b/src/library_noderawfs.js
+@@ -13,8 +13,13 @@ mergeInto(LibraryManager.library, {
+     '}' +
+     'else { throw new Error("NODERAWFS is currently only supported on Node.js environment.") }',
+   $NODERAWFS: {
++    lookup: function(parent, name) {
++      return FS.lookupPath(parent.path + '/' + name);
++    },
+     lookupPath: function(path) {
+-      return { path: path, node: { mode: NODEFS.getMode(path) } };
++      var st = fs.lstatSync(path);
++      var mode = NODEFS.getMode(path);
++      return { path: path, id: st.ino, mode: mode, node: { mode: mode } };
+     },
+     createStandardStreams: function() {
+       FS.streams[0] = { fd: 0, nfd: 0, position: 0, path: '', flags: 0, tty: true, seekable: false };
+@@ -36,7 +41,7 @@ mergeInto(LibraryManager.library, {
+     symlink: function() { fs.symlinkSync.apply(void 0, arguments); },
+     rename: function() { fs.renameSync.apply(void 0, arguments); },
+     rmdir: function() { fs.rmdirSync.apply(void 0, arguments); },
+-    readdir: function() { fs.readdirSync.apply(void 0, arguments); },
++    readdir: function() { return ['.', '..'].concat(fs.readdirSync.apply(void 0, arguments)); },
+     unlink: function() { fs.unlinkSync.apply(void 0, arguments); },
+     readlink: function() { return fs.readlinkSync.apply(void 0, arguments); },
+     stat: function() { return fs.statSync.apply(void 0, arguments); },
+@@ -58,9 +63,15 @@ mergeInto(LibraryManager.library, {
+       if (typeof flags === "string") {
+         flags = VFS.modeStringToFlags(flags)
+       }
+-      var nfd = fs.openSync(path, NODEFS.flagsForNode(flags), mode);
++      var pathTruncated = path.split('/').map(function(s) { return s.substr(0, 255); }).join('/');
++      var nfd = fs.openSync(pathTruncated, NODEFS.flagsForNode(flags), mode);
++      var st = fs.fstatSync(nfd);
++      if (flags & {{{ cDefine('O_DIRECTORY') }}} && !st.isDirectory()) {
++        throw new FS.ErrnoError(ERRNO_CODES.ENOTDIR);
++      }
++      var newMode = NODEFS.getMode(pathTruncated);
+       var fd = suggestFD != null ? suggestFD : FS.nextfd(nfd);
+-      var stream = { fd: fd, nfd: nfd, position: 0, path: path, flags: flags, seekable: true };
++      var stream = { fd: fd, nfd: nfd, position: 0, path: path, id: st.ino, flags: flags, mode: newMode, node_ops: NODERAWFS, seekable: true };
+       FS.streams[fd] = stream;
+       return stream;
+     },
+diff --git a/src/library_syscall.js b/src/library_syscall.js
+index 0405e1523..730f3b516 100644
+--- a/src/library_syscall.js
++++ b/src/library_syscall.js
+@@ -863,11 +863,16 @@ var SyscallsLibrary = {
+       var id;
+       var type;
+       var name = stream.getdents[idx];
+-      if (name[0] === '.') {
+-        id = 1;
++      if (name === '.') {
++        id = stream.id;
+         type = 4; // DT_DIR
+-      } else {
+-        var child = FS.lookupNode(stream.node, name);
++      }
++      else if (name === '..') {
++        id = FS.lookupPath(stream.path, { parent: true }).id;
++        type = 4; // DT_DIR
++      }
++      else {
++        var child = FS.lookupNode(stream, name);
+         id = child.id;
+         type = FS.isChrdev(child.mode) ? 2 :  // DT_CHR, character device.
+                FS.isDir(child.mode) ? 4 :     // DT_DIR, directory.
+diff --git a/src/struct_info.json b/src/struct_info.json
+index 18125e994..5db997c83 100644
+--- a/src/struct_info.json
++++ b/src/struct_info.json
+@@ -462,7 +462,10 @@
+             "F_SETOWN",
+             "O_TRUNC",
+             "O_DIRECTORY",
+-            "F_GETOWN",
++            "O_PATH",
++            "O_NONBLOCK",
++            "O_CLOEXEC",
++            "F_GETOWN", 
+             "F_GETOWN_EX",
+             "F_SETFD",
+             "O_EXCL",
+diff --git a/tests/dirent/test_readdir.c b/tests/dirent/test_readdir.c
+index cd929b957..685fb1cb2 100644
+--- a/tests/dirent/test_readdir.c
++++ b/tests/dirent/test_readdir.c
+@@ -28,6 +28,9 @@ static void create_file(const char *path, const char *buffer, int mode) {
+ 
+ void setup() {
+   int err;
++  err = mkdir("testtmp", 0777);  // can't call it tmp, that already exists
++  assert(!err);
++  chdir("testtmp");
+   err = mkdir("nocanread", 0111);
+   assert(!err);
+   err = mkdir("foobar", 0777);
+@@ -39,6 +42,8 @@ void cleanup() {
+   rmdir("nocanread");
+   unlink("foobar/file.txt");
+   rmdir("foobar");
++  chdir("..");
++  rmdir("testtmp");
+ }
+ 
+ void test() {
+@@ -54,9 +59,12 @@ void test() {
+   dir = opendir("noexist");
+   assert(!dir);
+   assert(errno == ENOENT);
++// NODERAWFS tests run as root, and the root user can opendir any directory
++#ifndef NODERAWFS
+   dir = opendir("nocanread");
+   assert(!dir);
+   assert(errno == EACCES);
++#endif
+   dir = opendir("foobar/file.txt");
+   assert(!dir);
+   assert(errno == ENOTDIR);
+diff --git a/tests/dirent/test_readdir.out b/tests/dirent/test_readdir.out
+index 1987b67f4..2043f98f9 100644
+--- a/tests/dirent/test_readdir.out
++++ b/tests/dirent/test_readdir.out
+@@ -1,10 +1,6 @@
+ success
+-n: 8
+-name: tmp
+-name: proc
++n: 4
+ name: nocanread
+-name: home
+ name: foobar
+-name: dev
+ name: ..
+ name: .
+diff --git a/tests/reference_struct_info.json b/tests/reference_struct_info.json
+index 72f03a111..9557f0968 100644
+--- a/tests/reference_struct_info.json
++++ b/tests/reference_struct_info.json
+@@ -358,6 +358,7 @@
+         "NOEXPR": 327681,
+         "O_ACCMODE": 2097155,
+         "O_APPEND": 1024,
++        "O_CLOEXEC": 524288,
+         "O_CREAT": 64,
+         "O_DIRECTORY": 65536,
+         "O_DSYNC": 4096,
+@@ -365,6 +366,8 @@
+         "O_LARGEFILE": 32768,
+         "O_NOCTTY": 256,
+         "O_NOFOLLOW": 131072,
++        "O_NONBLOCK": 2048,
++        "O_PATH": 2097152,
+         "O_RDONLY": 0,
+         "O_RDWR": 2,
+         "O_SYNC": 1052672,
+diff --git a/tests/test_core.py b/tests/test_core.py
+index 203183af3..ffaf3005b 100644
+--- a/tests/test_core.py
++++ b/tests/test_core.py
+@@ -5061,6 +5061,7 @@ main( int argv, char ** argc ) {
+     self.emcc_args += ['--embed-file', 'empty.txt']
+     self.do_run(src, '3\n')
+ 
++  @also_with_noderawfs
+   def test_readdir(self):
+     self.do_run_in_out_file_test('dirent/test_readdir.c')
+ 

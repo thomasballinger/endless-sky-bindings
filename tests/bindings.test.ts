@@ -1,4 +1,4 @@
-import { libFactory } from "../src/es-node.js";
+import { libFactory } from "endless-sky-bindings/dist/es-node.js";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import * as assert from "assert";
