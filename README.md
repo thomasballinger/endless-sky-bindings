@@ -1,6 +1,6 @@
 # JavaScript bindings for Endless Sky C++ code
 
-JavaScript wrapper for the C++ classes in [Endless Sky](https://github.com/endless-sky/endless-sky), compiled to JavaScript + WebAssembly by Emscripten.
+JavaScript wrapper for the C++ classes in [Endless Sky](https://github.com/endless-sky/endless-sky), compiled to JavaScript + WebAssembly by ((patched)[./emscripten-patch-rawnodefs.diff]) Emscripten.
 
 ```sh
 npm install endless-sky-bindings
