@@ -1,5 +1,4 @@
-import { exec, execFile } from "child_process";
-import { existsSync } from "fs";
+import { execFile } from "child_process";
 import * as path from "path";
 import * as url from "url";
 import * as util from "util";
@@ -10,12 +9,12 @@ const execFileP = util.promisify(execFile);
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const script = path.join(__dirname, "es-node.js");
 
-export const parseCoreDataWithSubprocess = async (resourceDir: string) => {
-  console.log("resourceDir:", resourceDir);
+export const parseCoreDataWithSubprocess = async (
+  resourceDir: string
+): Promise<LoadError[]> => {
   const output = await withPreparedFilesystem(
     { resources: resourceDir },
     async ({ config, resources }) => {
-      console.log("resources:", resources);
       const { stderr } = await execFileP(process.execPath, [
         script,
         "-s",
@@ -24,7 +23,6 @@ export const parseCoreDataWithSubprocess = async (resourceDir: string) => {
         "--resources",
         resources,
       ]);
-      console.log("stderr:", util.inspect(stderr));
       return stderr;
     }
   );
@@ -32,9 +30,8 @@ export const parseCoreDataWithSubprocess = async (resourceDir: string) => {
 };
 
 export const parsePluginWithSubprocess = async (
-  pluginDir: string,
-  executable?: string
-) => {
+  pluginDir: string
+): Promise<LoadError[]> => {
   let tmpPath: string | undefined;
 
   const output = await withPreparedFilesystem(
@@ -49,7 +46,6 @@ export const parsePluginWithSubprocess = async (
         "--resources",
         resources,
       ]);
-      console.log("stderr from Endless Sky:", util.inspect(stderr));
       return stderr;
     }
   );
@@ -71,19 +67,19 @@ export const shipEntityError = /(?<=\n)(?<entity>[(][^()]+(?<variant>[(][^()]*[)
 // these don't have blank lines on either side
 export const shipMissingEquippedOutfit = /(?<=\n)(?<entity>.*?): (?<msg>outfit "(?<outfit>.*?)".*[.])(?=\n)/g;
 
-// exported for testing
-export const parseErrors = (
-  output: string,
-  fileResolver?: (path: string) => string
-): {
+export type LoadError = {
   file?: string;
   lineno?: number;
   message: string;
   fullMessage: string;
   pat: string;
-}[] => {
-  //console.log('full es stderr output:')
-  //console.log(output);
+};
+
+// exported for testing
+export const parseErrors = (
+  output: string,
+  fileResolver?: (path: string) => string
+): LoadError[] => {
   const r = (p: string) => {
     // Endless Sky swaps \ for / so need to swap back
     if (path.sep === "\\") {
@@ -99,8 +95,6 @@ export const parseErrors = (
 
   const errors = [];
 
-  // TODO why does TypeScript think our compilation target isn't es6?
-  // @ts-ignore
   for (const m of s.matchAll(dataNodeError)) {
     errors.push({
       file: r(m.groups!.file!),
@@ -111,8 +105,6 @@ export const parseErrors = (
     });
   }
 
-  // TODO why does TypeScript think our compilation target isn't es6?
-  // @ts-ignore
   for (const m of s.matchAll(shipEntityError)) {
     errors.push({
       entity: r(m.groups!.entity!),
@@ -124,8 +116,6 @@ export const parseErrors = (
     });
   }
 
-  // TODO why does TypeScript think our compilation target isn't es6?
-  // @ts-ignore
   for (const m of s.matchAll(shipMissingEquippedOutfit)) {
     errors.push({
       entity: r(m.groups!.entity!),

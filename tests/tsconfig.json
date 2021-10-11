@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "module": "es2020",
+    "target": "es2020",
+    "lib": ["ES2020"],
     "moduleResolution": "Node",
     "esModuleInterop": true,
-    "noImplicitAny": true,
-    "downlevelIteration": true
+    "noImplicitAny": true
   }
 }

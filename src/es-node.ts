@@ -7,6 +7,10 @@ import process from "process";
 import * as mod from "./lib-node.js";
 import { withPreparedFilesystem } from "./filesystem.js";
 import { augmentEsLib, ESLib } from "./augmentlib.js";
+import {
+  parseCoreDataWithSubprocess,
+  parsePluginWithSubprocess,
+} from "./linting.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
@@ -123,7 +127,20 @@ export async function nodeLoadedEsLib(
 }
 
 const main = async () => {
-  console.log("running es-node as main!");
+  if (process.argv[2] === "plugin-load-errors") {
+    return console.log(
+      JSON.stringify(await parsePluginWithSubprocess(process.argv[3]), null, 2)
+    );
+  } else if (process.argv[2] === "core-load-errors") {
+    return console.log(
+      JSON.stringify(
+        await parseCoreDataWithSubprocess(process.argv[3]),
+        null,
+        2
+      )
+    );
+  }
+
   const args = process.argv.slice(2);
   const tmpArgs = args.slice(0);
 
