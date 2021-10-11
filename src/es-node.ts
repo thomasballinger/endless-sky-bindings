@@ -124,9 +124,8 @@ export async function nodeLoadedEsLib(
 
 const main = async () => {
   console.log("running es-node as main!");
-  debugger;
   const args = process.argv.slice(2);
-  const tmpArgs = args.slice(0)
+  const tmpArgs = args.slice(0);
 
   let runGame = true;
   let parse = true;
@@ -134,14 +133,14 @@ const main = async () => {
     if (tmpArgs[0] == "-s" || tmpArgs[0] == "--ships") {
       runGame = false;
       parse = true;
-      tmpArgs.shift()
+      tmpArgs.shift();
     } else if (tmpArgs[0] == "-w" || tmpArgs[0] == "--weapons") {
       runGame = false;
       parse = true;
-      tmpArgs.shift()
+      tmpArgs.shift();
     } else {
       // ignore this argument
-      tmpArgs.shift()
+      tmpArgs.shift();
     }
   }
   if (runGame) {
@@ -149,7 +148,7 @@ const main = async () => {
   }
   if (parse) {
     const esLib = await libFactory();
-    console.log('loaded, now calling GameDataBeginLoad...')
+    console.log("loaded, now calling GameDataBeginLoad...");
     esLib.GameDataBeginLoad(args);
   }
 };
