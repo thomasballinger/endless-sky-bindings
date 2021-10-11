@@ -31,6 +31,7 @@ export function augmentEsLib(esLib: any): ESLib {
     for (const arg of args) {
       arr.push_back(arg);
     }
+    console.log("calling _GameDataBeginLoad(", arr);
     return esLib._GameDataBeginLoad(arr);
   };
   return esLib;

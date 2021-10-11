@@ -42,14 +42,7 @@ export async function withPreparedFilesystem<T>(
       throw new Error("bad pluginDir path: " + options.pluginDir);
     }
     tmpPlugin = path.join(configDir, "plugins", TEMP_PLUGIN_NAME);
-    console.log(
-      "symlinking",
-      path.resolve(options.pluginDir),
-      "to link to, tmpPlugin"
-    );
     symlinkSync(path.resolve(options.pluginDir), tmpPlugin);
-    console.log(tmpPlugin, readdirSync(tmpPlugin));
-    console.log(tmpPlugin + "/data", readdirSync(tmpPlugin + "/data"));
   }
   if (!options.resources) {
     // if no resources, create blank one!
@@ -78,22 +71,11 @@ export async function withPreparedFilesystem<T>(
     throw e;
   } finally {
     if (options.pluginDir) {
-      console.log(
-        "cleaning up pluginDir",
-        path.join(configDir, "plugins", TEMP_PLUGIN_NAME)
-      );
-      console.log(
-        readdirSync(path.join(configDir, "plugins", TEMP_PLUGIN_NAME))
-      );
       unlinkSync(path.join(configDir, "plugins", TEMP_PLUGIN_NAME));
     }
-    console.log("cleaning up configDir", configDir);
     rmdirSync(configDir, { recursive: true });
-    console.log("removed", configDir);
     if (tmpResources) {
-      console.log("cleaning up tmpResources", configDir);
       rmdirSync(tmpResources, { recursive: true });
-      console.log("removed", configDir);
     }
   }
 }

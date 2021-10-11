@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as url from "url";
 import * as os from "os";
+import process from "process";
 
 import * as mod from "./lib-node.js";
 import { withPreparedFilesystem } from "./filesystem.js";
@@ -120,3 +121,45 @@ export async function nodeLoadedEsLib(
     }
   );
 }
+
+const main = async () => {
+  console.log("running es-node as main!");
+  debugger;
+  const args = process.argv.slice(2);
+  const tmpArgs = args.slice(0)
+
+  let runGame = true;
+  let parse = true;
+  while (tmpArgs.length) {
+    if (tmpArgs[0] == "-s" || tmpArgs[0] == "--ships") {
+      runGame = false;
+      parse = true;
+      tmpArgs.shift()
+    } else if (tmpArgs[0] == "-w" || tmpArgs[0] == "--weapons") {
+      runGame = false;
+      parse = true;
+      tmpArgs.shift()
+    } else {
+      // ignore this argument
+      tmpArgs.shift()
+    }
+  }
+  if (runGame) {
+    throw new Error("Can't run game yet, not implemented");
+  }
+  if (parse) {
+    const esLib = await libFactory();
+    console.log('loaded, now calling GameDataBeginLoad...')
+    esLib.GameDataBeginLoad(args);
+  }
+};
+if (process.argv[1] === url.fileURLToPath(import.meta.url)) {
+  // The script was run directly.
+  main();
+}
+
+// reexports for tests - is there a better way to do this? don't bundle?
+export * from "./linting.js";
+export * from "./plugin.js";
+export * from "./filesystem.js";
+export * from "./augmentlib.js";

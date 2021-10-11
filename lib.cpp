@@ -124,9 +124,6 @@ EMSCRIPTEN_BINDINGS(GameData) {
                     cstrs.push_back(const_cast<char *>(s.c_str()));
                 }
                 cstrs.push_back(NULL);
-                std::cout << "argVec.size(): " << argVec.size() << "\n";
-                std::cout << "cstrs.size(): " << cstrs.size() << "\n";
-                std::cout << "cstrs.data(): " << *cstrs.data() << "\n";
                 return GameData::BeginLoad(cstrs.data());
             }
         ));

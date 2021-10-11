@@ -4,8 +4,8 @@
   "description": "Separate package so these can be installed in CI to test on other platforms.",
   "type": "module",
   "scripts": {
-    "test": "tap --no-check-coverage --node-arg=--loader=ts-node/esm ./*.test.*",
-    "test-debug": "tap --node-arg=--inspect-brk --debug -T --no-check-coverage --node-arg=--loader=ts-node/esm ./*.test.*"
+    "test": "tap --no-coverage --node-arg=--loader=ts-node/esm ./*.test.*",
+    "test-debug": "tap --node-arg=--inspect-brk --debug -T --no-coverage --node-arg=--loader=ts-node/esm ./*.test.*"
   },
   "author": "",
   "license": "GPL-3.0",
