@@ -76,19 +76,19 @@ index dd6fabc9..3a192707 100644
 --- a/source/GameData.cpp
 +++ b/source/GameData.cpp
 @@ -200,11 +200,13 @@ bool GameData::BeginLoad(const char * const *argv)
-
-             // Check that the image set is complete.
-             it.second->Check();
+ 		
+ 		// Check that the image set is complete.
+ 		it.second->Check();
 +#ifndef ES_NODE_BINDINGS
-             // For landscapes, remember all the source files but don't load them yet.
-             if(ImageSet::IsDeferred(it.first))
-                     deferred[SpriteSet::Get(it.first)] = it.second;
-             else
-                     spriteQueue.Add(it.second);
+ 		// For landscapes, remember all the source files but don't load them yet.
+ 		if(ImageSet::IsDeferred(it.first))
+ 			deferred[SpriteSet::Get(it.first)] = it.second;
+ 		else
+ 			spriteQueue.Add(it.second);
 +#endif
-     }
-
-     // Generate a catalog of music files.
+ 	}
+ 	
+ 	// Generate a catalog of music files.
 diff --git a/source/GameWindow.cpp b/source/GameWindow.cpp
 index a7327023..da5b6d71 100644
 --- a/source/GameWindow.cpp
