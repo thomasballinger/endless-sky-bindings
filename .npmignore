@@ -11,19 +11,18 @@
 # These are compiled Typescript files
 !dist/es-node.js
 !dist/es-node.js.map
-!dist/es-node.d.ts
 !dist/es-web.js
 !dist/es-web.js.map
-!dist/es-web.d.ts
 
 # These are the output of Emscripten, they can be treated like binaries
 !dist/lib-node.js
 !dist/lib-node.wasm
-!dist/lib-node.d.ts
 !dist/lib-web.js
 !dist/lib-web.wasm
 !dist/lib-web.data
-!dist/lib-web.d.ts
+
+# We bundle everythign else, but the TypeScript types stay in separate files
+!dist/*.d.ts
 
 # This is a funny shim we should probably get rid of.
 # It has the same interface as es-node.js and es-web.js but imports the correct one.
