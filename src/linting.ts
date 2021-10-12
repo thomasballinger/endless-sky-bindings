@@ -4,10 +4,23 @@ import * as url from "url";
 import * as util from "util";
 
 import { withPreparedFilesystem } from "./filesystem";
+import { getResourcesDir, getPluginDir, isCoreDataFile } from "./plugin";
 
 const execFileP = util.promisify(execFile);
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const script = path.join(__dirname, "es-node.js");
+
+export const parseWithSubprocess = async (
+  path: string
+): Promise<LoadError[]> => {
+  if (isCoreDataFile(path)) {
+    const dataDir = getResourcesDir(path);
+    return parseCoreDataWithSubprocess(dataDir);
+  } else {
+    const pluginDir = getPluginDir(path);
+    return parsePluginWithSubprocess(pluginDir);
+  }
+};
 
 export const parseCoreDataWithSubprocess = async (
   resourceDir: string

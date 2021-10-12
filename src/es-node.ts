@@ -10,6 +10,7 @@ import { augmentEsLib, ESLib } from "./augmentlib.js";
 import {
   parseCoreDataWithSubprocess,
   parsePluginWithSubprocess,
+  parseWithSubprocess,
 } from "./linting.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -138,6 +139,10 @@ const main = async () => {
         null,
         2
       )
+    );
+  } else if (process.argv[2] === "load-errors") {
+    return console.log(
+      JSON.stringify(await parseWithSubprocess(process.argv[3]), null, 2)
     );
   }
 
