@@ -9,12 +9,10 @@ test: node web
 	wget -q https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/2.1.0.tar.gz
 libjpeg-turbo-2.1.0: 2.1.0.tar.gz
 	tar xzf 2.1.0.tar.gz
-# workaround for https://github.com/emscripten-core/emscripten/issues/13551
-libjpeg-turbo-2.1.0/package.json:
-	echo '{ "type": "commonjs" }' > $@
+	# workaround for https://github.com/emscripten-core/emscripten/issues/13551
+	echo '{ "type": "commonjs" }' > libjpeg-turbo-2.1.0/package.json
 # | means libjpeg-turbo-2.1.0 is a "order-only prerequisite" so creating the file doesn't invalidate the dir
-libjpeg-turbo-2.1.0/libturbojpeg.a: | libjpeg-turbo-2.1.0 libjpeg-turbo-2.1.0/package.json
-libjpeg-turbo-2.1.0/libturbojpeg.a: | libjpeg-turbo-2.1.0 libjpeg-turbo-2.1.0/package.json
+libjpeg-turbo-2.1.0/libturbojpeg.a: | libjpeg-turbo-2.1.0
 ifndef EMSCRIPTEN_ENV
 	$(error "emmake is not available, activate the emscripten env first")
 endif
